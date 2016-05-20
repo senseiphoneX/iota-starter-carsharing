@@ -42,6 +42,9 @@ class TripsTableViewController: UIViewController {
     override func viewWillAppear(animated: Bool) {
         self.navigationController?.setNavigationBarHidden(true, animated: true)
         super.viewWillAppear(animated)
+        
+        self.titleLabel.text = "Fetching trips..."
+        getTrips()
     }
 
     func getTrips() {
@@ -52,7 +55,12 @@ class TripsTableViewController: UIViewController {
         API.doRequest(request) { (response, jsonArray) -> Void in
             dispatch_async(dispatch_get_main_queue(), {
                 self.trips = TripData.fromDictionary(jsonArray)
-                self.titleLabel.text = "You have \(self.trips.count) trips."
+                
+                switch self.trips.count {
+                case 0: self.titleLabel.text = "You have no trips."
+                case 1: self.titleLabel.text = "You have 1 trip."
+                default: self.titleLabel.text = "You have \(self.trips.count) trips."
+                }
                 
                 self.trips.sortInPlace({$0.start_time > $1.start_time})
 

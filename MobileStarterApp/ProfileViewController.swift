@@ -41,6 +41,14 @@ class ProfileViewController: UIViewController {
         getDriverStats()
     }
     
+    override func viewWillAppear(animated: Bool) {
+        self.navigationController?.setNavigationBarHidden(true, animated: true)
+        super.viewWillAppear(animated)
+        
+        self.fetchingLabel.text = "Fetching profile..."
+        getDriverStats()
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
