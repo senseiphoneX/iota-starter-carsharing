@@ -95,6 +95,11 @@ class ProfileViewController: UIViewController {
                         self.tableView.reloadData()
                     })
                 }
+            } else {
+                dispatch_async(dispatch_get_main_queue(), {
+                    self.fetchingLabel.text = "You have no trips."
+                    self.tableView.reloadData()
+                })
             }
         }
     }
