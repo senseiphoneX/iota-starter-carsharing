@@ -140,6 +140,7 @@ class CreateReservationViewController: UIViewController {
         case 200:
             title = "Reservation successful"
             CarBrowseViewController.userReserved = true
+            ReservationsViewController.userReserved = true
             
             break
         case 409:
