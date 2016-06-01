@@ -14,6 +14,10 @@ The sample source code for the companion IoT for Automotive Starter Server App c
 
 This application source code was developed using Xcode 7.3.  To run this app, clone this repo and double click on the ```MobileStarterApp.xcodeproj``` file and click the run button at the top left of the Xcode UI.
 
+**Note: Please make sure that you are running Xcode 7.3+** 
+
+[![](XcodePreview.png)](https://www.youtube.com/watch?v=7CLvEIxQo10 "Instruction Movie")  
+
 -----
 ## What does this app demonstrate?
 
