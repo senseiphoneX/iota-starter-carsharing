@@ -19,7 +19,7 @@ import CoreLocation
 
 class CompleteReservationViewController: UIViewController {
     
-    var reservation: ReservationsData?
+    var reservation: ReservationsData? // set by ReservationsViewController
 
     @IBOutlet weak var changeReservationButton: UIButton!
     @IBOutlet weak var cancelReservationButton: UIButton!
@@ -48,7 +48,7 @@ class CompleteReservationViewController: UIViewController {
         
         changeReservationButton.backgroundColor = color
         
-        platNumberLabel.text = "257-GBJ"
+        platNumberLabel.text = reservation?.carDetails?.license
         
         pickUpLabel.text = "Unknown location"
         
@@ -97,6 +97,8 @@ class CompleteReservationViewController: UIViewController {
     }
 
     @IBAction func cancelReservationAction(sender: AnyObject) {
+        cancelReservationButton.enabled = false
+        
         let url = NSURL(string: "\(API.reservation)/\(self.reservation!._id!)")!
         let request = NSMutableURLRequest(URL: url)
         
@@ -105,11 +107,17 @@ class CompleteReservationViewController: UIViewController {
                 // if the reservation is active, then can cancel using DELETE
                 request.HTTPMethod = "DELETE"
             } else {
+                
                 // if the reservation isn't active, then can complete using PUT
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
                 request.HTTPMethod = "PUT"
                 
-                let parm = ["status": "close"]
+                var parm = ["status": "close"]
+                let trip_id = ViewController.getTripId((self.reservation?.carDetails!.deviceID)!);
+                if(trip_id != nil){
+                    // bind this trip to this reservation
+                    parm["trip_id"] = trip_id
+                }
                 if let data = try? NSJSONSerialization.dataWithJSONObject(parm, options:NSJSONWritingOptions(rawValue: 0)) as NSData? {
                     request.HTTPBody = data
                     request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -121,19 +129,30 @@ class CompleteReservationViewController: UIViewController {
         API.doRequest(request) { (httpResponse, jsonArray) -> Void in
             let statusCode = httpResponse.statusCode
             var title = ""
+            var reservationType:String
             var leavePage = true
             switch statusCode {
             case 200:
                 if let _ = self.reservation?.status {
                     if self.reservation!.status == "active" {
                         title = "Reservation canceled"
+                        reservationType = "pickup"
                     } else {
                         title = "Reservation complete"
+                        reservationType = "dropoff"
                     }
                     
                     ReservationsViewController.userReserved = true
                     CarBrowseViewController.userReserved = true
-                }
+                    NotificationUtils.cancelNotification([
+                        "reservationId":(self.reservation?._id)!,
+                        "type": reservationType,
+                        "appRoute": API.connectedAppURL,
+                        "appGUID": API.connectedAppGUID,
+                        "customAuth": API.connectedCustomAuth
+                    ])
+                 }
+                ViewController.completeDrive((self.reservation?.carDetails!.deviceID)!);
                 break
             default:
                 title = "Something went wrong."
@@ -191,6 +210,14 @@ class CompleteReservationViewController: UIViewController {
                         self.unlockMessageLabel.text = "Enjoy your ride and drive safe"
                         self.unlockMessageLabel.textColor = Colors.accent
                         self.setLabelsAccordingToStatus()
+                        NotificationUtils.cancelNotification([
+                            "reservationId":reservationId!,
+                            "type":"pickup",
+                            "appRoute": API.connectedAppURL,
+                            "appGUID": API.connectedAppGUID,
+                            "customAuth": API.connectedCustomAuth
+                        ])
+                        ReservationUtils.setDropoffNotification(self.reservation!)
                     }
                 })
             default:
@@ -270,7 +297,7 @@ class CompleteReservationViewController: UIViewController {
         let pickupTimeString = dateFormatter.stringFromDate(pickupDate)
         let dropoffTimeString = dateFormatter.stringFromDate(dropoffDate)
         
-        var durationText = "\(pickupDate) \(pickupTimeString)"
+        var durationText = "\(pickupDateString) \(pickupTimeString)"
         if pickupDateString == dropoffDateString {
             durationText += " - \(dropoffTimeString)"
         } else {

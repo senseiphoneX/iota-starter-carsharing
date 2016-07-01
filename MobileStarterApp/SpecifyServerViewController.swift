@@ -20,10 +20,11 @@ class SpecifyServerViewController: UIViewController {
 
     @IBOutlet weak var moreInfoButton: UIButton!
     @IBOutlet weak var useDefaultButton: UIButton!
+    var serverSpecified = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        NSUserDefaults.standardUserDefaults().setValue(nil, forKey: "appRoute")
+        serverSpecified = false
     }
 
     override func viewWillAppear(animated: Bool) {
@@ -31,17 +32,20 @@ class SpecifyServerViewController: UIViewController {
         navigationController?.navigationBar.backItem?.title = ""
         self.title = "Specify Server"
         
-
         if let appRoute: String = NSUserDefaults.standardUserDefaults().valueForKey("appRoute") as? String {
             if let url : NSURL = NSURL(string: appRoute) {
                 if UIApplication.sharedApplication().canOpenURL(url) {
-                    API.doInitialize()
-                    performSegueWithIdentifier("goToHomeScreen", sender: self)
+                    if(serverSpecified){
+                        API.doInitialize()
+                        performSegueWithIdentifier("goToHomeScreen", sender: self)
+                    }
                 } else {
                     showError("No valid URL found from data provided:\n\n\(appRoute)")
+                    serverSpecified = false
                 }
             } else {
                 showError("No valid URL found from data provided:\n\n\(appRoute)")
+                serverSpecified = false
             }
         }
         
@@ -58,6 +62,9 @@ class SpecifyServerViewController: UIViewController {
     }
     
     @IBAction func useDefaultAction(sender: AnyObject) {
+        NSUserDefaults.standardUserDefaults().removeObjectForKey("appRoute")
+        NSUserDefaults.standardUserDefaults().removeObjectForKey("appGUID")
+        NSUserDefaults.standardUserDefaults().removeObjectForKey("customAuth")
         API.doInitialize()
     }
 
@@ -65,6 +72,14 @@ class SpecifyServerViewController: UIViewController {
         let url : NSURL = NSURL(string: "http://www.ibm.com/internet-of-things/iot-industry/iot-automotive/")!
         if UIApplication.sharedApplication().canOpenURL(url) {
             UIApplication.sharedApplication().openURL(url)
+        }
+    }
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if(segue.identifier == "goToHomeScreen"){
+            ReservationUtils.resetReservationNotifications()
+            NotificationUtils.initRemoteNotification()
+        }else if(segue.identifier == "goToCodeReader"){
+            serverSpecified = true
         }
     }
 }

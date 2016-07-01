@@ -16,11 +16,16 @@
 
 import CoreLocation
 import UIKit
+import BMSCore
+import BMSSecurity
 
 struct API {
     
-    static var connectedAppURL = "https://iot-automotive-starter.mybluemix.net"
-    //static var connectedAppGUID = "b686b8fc-6e12-4ca0-bbee-e0ead628c1fa"
+    static var connectedAppURL = "https://iota-starter-server.mybluemix.net"
+    static var connectedAppGUID = ""
+    static var connectedCustomAuth = "" // non-MCA server
+    static var bmRegion = BMSClient.REGION_US_SOUTH
+    static var customRealm = "custauth"
     
     static var carsNearby = "\(connectedAppURL)/user/carsnearby"
     static var reservation = "\(connectedAppURL)/user/reservation"
@@ -30,16 +35,70 @@ struct API {
     static var trips = "\(connectedAppURL)/user/driverInsights"
     static var tripBehavior = "\(connectedAppURL)/user/driverInsights/behaviors"
     static var latestTripBehavior = "\(connectedAppURL)/user/driverInsights/behaviors/latest"
-    static var tripRoutes = "\(connectedAppURL)/user/driverInsights/triproutes"
+    static var tripRoutes = "\(connectedAppURL)/user/triproutes"
+    static var credentials = "\(connectedAppURL)/user/device/credentials"
+    
+    static func delegateCustomAuthHandler() -> Void {
+        let delegate = CustomAuthDelegate()
+        let mcaAuthManager = MCAAuthorizationManager.sharedInstance
+        
+        do {
+            try mcaAuthManager.registerAuthenticationDelegate(delegate, realm: customRealm)
+            print("CustomeAuthDelegate was registered")
+        } catch {
+            print("error with register: \(error)")
+        }
+        return
+    }
     
     static func doInitialize() {
         let userDefaults = NSUserDefaults.standardUserDefaults()
-        if let appRoute = userDefaults.valueForKey("appRoute") as? String {
+        if let appRoute = userDefaults.valueForKey("appRoute") as? String,
+            let appGUID = userDefaults.valueForKey("appGUID") as? String,
+            let customAuth = userDefaults.valueForKey("customAuth") as? String {
             connectedAppURL = appRoute
+            connectedAppGUID = appGUID
+            connectedCustomAuth = customAuth
         }
+        if connectedCustomAuth == "true" {
+            print("initialize and set up MCA")
+            BMSClient.sharedInstance.initializeWithBluemixAppRoute(connectedAppURL, bluemixAppGUID: connectedAppGUID, bluemixRegion: bmRegion)
+            BMSClient.sharedInstance.authorizationManager = MCAAuthorizationManager.sharedInstance
+            delegateCustomAuthHandler()
+        } else {
+            print("non-MCA server")
+        }
+    }
+    
+    static func login(requestAfterLogin: NSMutableURLRequest?, callback: ((NSHTTPURLResponse, [NSDictionary]) -> Void)?){
+        let customResourceURL = BMSClient.sharedInstance.bluemixAppRoute! + "/user/login"
+        let request = Request(url: customResourceURL, method: HttpMethod.GET)
+        
+        print("get to /user/login")
+        let callBack:BmsCompletionHandler = {(response: Response?, error: NSError?) in
+            if error == nil {
+                print ("response :: \(response?.responseText), no error")
+                if let newRequest = requestAfterLogin {
+                    self.doRequest(newRequest, callback: callback)
+                } else {
+                    print ("error:: \(error.debugDescription)")
+                }
+            }
+        }
+        request.sendWithCompletionHandler(callBack)
     }
    
     static func handleError(error: NSError) {
+        doHandleError("Communication Error", message: "\(error)", moveToRoot: true)
+    }
+    
+    static func handleServerError(data:NSData, response: NSHTTPURLResponse) {
+        let responseString = String(data: data, encoding: NSUTF8StringEncoding)
+        let statusCode = response.statusCode
+        doHandleError("Server Error", message: "Status Code: \(statusCode) - \(responseString!)", moveToRoot: false)
+    }
+    
+    static func doHandleError(title:String, message: String, moveToRoot: Bool) {
         var vc: UIViewController?
         if var topController = UIApplication.sharedApplication().keyWindow?.rootViewController {
             while let presentedViewController = topController.presentedViewController {
@@ -51,13 +110,16 @@ struct API {
             vc = window!!.rootViewController!
         }
         
-        let alert = UIAlertController(title: "Communcation Error", message: "\(error)", preferredStyle: .Alert)
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .Alert)
         let okAction = UIAlertAction(title: "OK", style: .Cancel) { action -> Void in
             alert.removeFromParentViewController()
-            // reset view back to Get Started
-            let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            let controller = storyboard.instantiateInitialViewController()! as UIViewController
-            UIApplication.sharedApplication().windows[0].rootViewController = controller
+            if(moveToRoot){
+                UIApplication.sharedApplication().cancelAllLocalNotifications()
+                // reset view back to Get Started
+                let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                let controller = storyboard.instantiateInitialViewController()! as UIViewController
+                UIApplication.sharedApplication().windows[0].rootViewController = controller
+            }
         }
         alert.addAction(okAction)
         
@@ -92,6 +154,10 @@ struct API {
             
             let responseString = NSString(data: data!, encoding: NSUTF8StringEncoding)
             print("responseString = \(responseString!)")
+            if !checkAPIVersion(response as! NSHTTPURLResponse) {
+                doHandleError("API Version Error", message: "API version between the server and mobile app is inconsistent. Please upgrade your server or mobile app.", moveToRoot: true)
+                return;
+            }
             
             var jsonArray: [NSMutableDictionary] = []
             do {
@@ -119,9 +185,30 @@ struct API {
             let httpStatus = response as? NSHTTPURLResponse
             print("statusCode was \(httpStatus!.statusCode)")
             
-            callback?((response as? NSHTTPURLResponse)!, jsonArray)
+            let statusCode = httpStatus?.statusCode
+            
+            switch statusCode! {
+            case 401:
+                self.login(request, callback: callback)
+                break
+            case 500..<600:
+                self.handleServerError(data!, response: (response as? NSHTTPURLResponse)!)
+                break
+            default:
+                callback?((response as? NSHTTPURLResponse)!, jsonArray)
+            }
         }
         task.resume()
+    }
+    static func checkAPIVersion(response:NSHTTPURLResponse)->Bool{
+        guard let apiVersion:String = response.allHeaderFields["iota-starter-car-sharing-version"] as? String else{
+            print("Server API 1.0 is not supported")
+            return false
+        }
+        let appVersion = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleShortVersionString") as! String
+        let splitedApiVersion = apiVersion.componentsSeparatedByString(".")
+        let splitedAppVersion = appVersion.componentsSeparatedByString(".")
+        return splitedApiVersion[0] == splitedAppVersion[0]
     }
     
     static func getLocation(lat: Double, lng: Double, label: UILabel) -> Void {

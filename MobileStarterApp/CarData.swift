@@ -36,6 +36,14 @@ class CarData: NSObject, MKAnnotation {
     var hourlyRate: Int?
     var dailyRate: Int?
     var thumbnailURL: String?
+    var type: String?
+    var drive: String?
+    var license: String?
+    
+    var rate: Double?
+    var rateCauseCategory: String?
+    var rateCauseShort: String?
+    var rateCauseLong: String?
 
     class func fromDictionary(array:NSArray) -> [CarData] {
         var returnArray:[CarData] = []
@@ -63,6 +71,7 @@ class CarData: NSObject, MKAnnotation {
 		name = dictionary["name"] as? String
 		status = dictionary["status"] as? String
 		distance = dictionary["distance"] as? Int
+        license = dictionary["license"] as? String
         
         if let latTemp = lat, longTemp = lng {
             coordinate = CLLocationCoordinate2D(latitude: latTemp, longitude: longTemp)
@@ -71,16 +80,29 @@ class CarData: NSObject, MKAnnotation {
         }
         title = name
         
-        if (dictionary["model"] != nil) {
-            makeModel = dictionary["model"]!["makeModel"] as? String
-            year = dictionary["model"]!["year"] as? Int
-            mileage = dictionary["model"]!["mileage"] as? Int
-            stars = dictionary["model"]!["stars"] as? Int
-            hourlyRate = Int((dictionary["model"]!["hourlyRate"] as? Double)!)
-            dailyRate = Int((dictionary["model"]!["dailyRate"] as? Double)!)
-            thumbnailURL = dictionary["model"]!["thumbnailURL"] as? String
+        if let model = dictionary["model"] {
+            makeModel = model["makeModel"] as? String
+            year = model["year"] as? Int
+            mileage = model["mileage"] as? Int
+            stars = model["stars"] as? Int
+            hourlyRate = Int((model["hourlyRate"] as? Double)!)
+            dailyRate = Int((model["dailyRate"] as? Double)!)
+            thumbnailURL = model["thumbnailURL"] as? String
+            type = model["type"] as? String
+            drive = model["drive"] as? String
         }
         
+        if let recommendation = dictionary["recommendation"] {
+            rate = recommendation["rate"] as? Double
+            
+            if let causes = recommendation["causes"] {
+                if causes?.count > 0 {
+                    rateCauseCategory = causes![0]["category"] as? String
+                    rateCauseShort = causes![0]["shortText"] as? String
+                    rateCauseLong = causes![0]["longText"] as? String
+                }
+            }
+        }
         
 	}
 }

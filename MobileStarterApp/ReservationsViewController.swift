@@ -68,6 +68,8 @@ class ReservationsViewController: UIViewController {
             if let selectedIndex: NSIndexPath! = self.tableView.indexPathForCell(tableCell) {
                 targetController.reservation = self.reservations[selectedIndex!.item]
             }
+        }else if let reservation = sender as? ReservationsData {
+            targetController.reservation = reservation
         }
     }
 }
@@ -124,7 +126,7 @@ extension ReservationsViewController: UITableViewDataSource {
             if let latTemp = carDetails.lat, longTemp = carDetails.lng {
                 API.getLocation(latTemp, lng: longTemp, label: cell.dropOffLocationLabel)
             } else {
-                cell.dropOffTimeLabel.text = "Uknown location"
+                cell.dropOffLocationLabel.text = "Uknown location"
             }
             
         } else {

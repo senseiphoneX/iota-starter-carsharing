@@ -18,6 +18,7 @@ import Foundation
 
 class TripData {
     var score : Double?
+    var trip_id : String?
 	var trip_uuid : String?
 	var mo_id : String?
 	var start_time : Double?
@@ -40,6 +41,7 @@ class TripData {
 
 	init(dictionary: NSDictionary) {
         score = dictionary["score"] as? Double
+        trip_id = dictionary["trip_id"] as? String
 		trip_uuid = dictionary["trip_uuid"] as? String
 		mo_id = dictionary["mo_id"] as? String
 		start_time = dictionary["start_time"] as? Double

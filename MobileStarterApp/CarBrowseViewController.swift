@@ -25,15 +25,23 @@ class CarBrowseViewController: UIViewController {
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var headerView: UIView!
     
-    @IBOutlet weak var locationIcon: UIButton!    
+    @IBOutlet weak var locationIcon: UIButton!
     
     let locationManager = CLLocationManager()
     var location: CLLocationCoordinate2D?
     var carData: [CarData] = []
     var mapRect: MKMapRect?
     
+    static let MIN_MAP_RECT_WIDTH:Double = 5000
+    static let MIN_MAP_RECT_HEIGHT:Double = 5000
+
     static var thumbnailCache = NSMutableDictionary()
     static var jsonIndexCache = NSMutableDictionary()
+    
+    static var pickupDate: Int?
+    static var dropoffDate: Int?
+    static var filtersApplied: Bool = false
+    static var userOwnDeviceCreated: Bool = false
     
     let pickerData = [
         "Current Location",
@@ -64,10 +72,7 @@ class CarBrowseViewController: UIViewController {
         self.mapView.delegate = self
         self.tabBarController?.tabBar.hidden = false
         
-        // have to do the following to get the map to show the user location
         self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        // also needed to add NSLocationWhenInUseUsageDescription to Info.plist
-        // and provide some String that is message to user
         self.locationManager.requestWhenInUseAuthorization()
         self.locationManager.startUpdatingLocation()
         self.mapView.showsUserLocation = true
@@ -78,8 +83,6 @@ class CarBrowseViewController: UIViewController {
         headerView.backgroundColor = Colors.dark
         
         setupPicker()
-                
-        // then need locationManager function below
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -89,14 +92,34 @@ class CarBrowseViewController: UIViewController {
             clearCarsFromMap(true)
             getCars(self.location!)
         }
+        
+        if (CarBrowseViewController.filtersApplied) {
+            clearCarsFromMap(true)
+            getCars(self.location!)
+            self.titleLabel.text = "Applying your filters..."
+            carData = []
+            self.tableView.reloadData()
+        } else if (ViewController.behaviorDemo) {
+            self.titleLabel.text = "Loading..."
+        }
+        
+        if (ViewController.behaviorDemo) {
+            locationIcon.hidden = true
+        }
+        
         super.viewWillAppear(animated)
     }
     
     func getCars(location: CLLocationCoordinate2D) {
         let lat = location.latitude
         let lng = location.longitude
+        let url: NSURL
         
-        let url: NSURL = NSURL(string: "\(API.carsNearby)/\(lat)/\(lng)")!
+        if (CarBrowseViewController.pickupDate != nil && CarBrowseViewController.dropoffDate != nil) {
+            url = NSURL(string: "\(API.carsNearby)/\(lat)/\(lng)/\((CarBrowseViewController.pickupDate)!)/\((CarBrowseViewController.dropoffDate)!)")!
+        } else {
+            url = NSURL(string: "\(API.carsNearby)/\(lat)/\(lng)")!
+        }
         
         let request: NSMutableURLRequest = NSMutableURLRequest(URL: url)
         request.HTTPMethod = "GET"
@@ -104,8 +127,30 @@ class CarBrowseViewController: UIViewController {
         API.doRequest(request) { (response, jsonArray) -> Void in
             dispatch_async(dispatch_get_main_queue(), {
                 self.clearCarsFromMap(true)
-                
                 self.carData = CarData.fromDictionary(jsonArray)
+                if (ViewController.behaviorDemo && !CarBrowseViewController.userOwnDeviceCreated) {
+                    if(self.carData.indexOf({$0.deviceID == ViewController.mobileAppDeviceId}) < 0){
+                        // create user own device locally. 
+                        // Once its created in server-side as result of getCredentials, stop this.
+                        let carInfo: NSDictionary = [
+                            "deviceID": ViewController.mobileAppDeviceId,
+                            "name": "User owened car",
+                            "model": [
+                                "stars": 5,
+                                "makeModel": "User's device",
+                                "year": 2016,
+                                "mileage": 0,
+                                "thumbnailURL": "\(API.connectedAppURL)/images/car_icon.png",
+                                "hourlyRate": 0,
+                                "dailyRate": 0
+                            ],
+                            "distance": 0,
+                            "lat": lat, "lng": lng];
+                        self.carData.append(CarData.init(dictionary: carInfo))
+                    }else{
+                        CarBrowseViewController.userOwnDeviceCreated = true
+                    }
+                }
             
                 // add annotations to the map
                 self.mapView.addAnnotations(self.carData)
@@ -119,23 +164,45 @@ class CarBrowseViewController: UIViewController {
                 }
                 
                 self.carData.sortInPlace({$0.distance < $1.distance})
+                if (CarBrowseViewController.pickupDate != nil && CarBrowseViewController.dropoffDate != nil) {
+                    self.carData.sortInPlace({$0.rate > $1.rate})
+                }
+                
+                // my device should be always displayed at top
+                if(ViewController.behaviorDemo){
+                    let mydeviceindex = self.carData.indexOf({$0.deviceID == ViewController.mobileAppDeviceId});
+                    if(mydeviceindex > 0){
+                        self.carData.insert(self.carData.removeAtIndex(mydeviceindex!), atIndex: 0)
+                    }
+                }
             
                 self.tableView.reloadData()
                 
                 CarBrowseViewController.userReserved = false
+                CarBrowseViewController.filtersApplied = false
                 
-                var points: [CLLocationCoordinate2D] = [CLLocationCoordinate2D]()
+                if(self.carData.count > 0){
+                    var points: [CLLocationCoordinate2D] = [CLLocationCoordinate2D]()
                 
-                for car in self.carData {
-                    points.append(CLLocationCoordinate2DMake(car.lat!, car.lng!))
+                    for car in self.carData {
+                        points.append(CLLocationCoordinate2DMake(car.lat!, car.lng!))
+                    }
+                    points.append(self.location!)
+                    let polyline = MKPolyline(coordinates: UnsafeMutablePointer(points), count: points.count)
+                
+                    self.mapView.addOverlay(polyline)
+                    self.mapRect = self.mapView.mapRectThatFits(polyline.boundingMapRect, edgePadding: UIEdgeInsetsMake(50, 50, 50, 50))
+                    if self.mapRect?.size.width < CarBrowseViewController.MIN_MAP_RECT_WIDTH {
+                        self.mapRect?.size.width = CarBrowseViewController.MIN_MAP_RECT_WIDTH
+                        self.mapRect?.origin.x = (self.mapRect?.origin.x)! - CarBrowseViewController.MIN_MAP_RECT_WIDTH/2
+                    }
+                    if self.mapRect?.size.height < CarBrowseViewController.MIN_MAP_RECT_HEIGHT {
+                        self.mapRect?.size.height = CarBrowseViewController.MIN_MAP_RECT_HEIGHT
+                        self.mapRect?.origin.y = (self.mapRect?.origin.y)! - CarBrowseViewController.MIN_MAP_RECT_HEIGHT/2
+                    }
+                
+                    self.mapView.setVisibleMapRect(self.mapRect!, animated: true)
                 }
-                points.append(self.location!)
-                let polyline = MKPolyline(coordinates: UnsafeMutablePointer(points), count: points.count)
-                
-                self.mapView.addOverlay(polyline)
-                self.mapRect = self.mapView.mapRectThatFits(polyline.boundingMapRect, edgePadding: UIEdgeInsetsMake(50, 50, 50, 50))
-                
-                self.mapView.setVisibleMapRect(self.mapRect!, animated: true)
             })
         }
     }
@@ -152,16 +219,17 @@ class CarBrowseViewController: UIViewController {
     
     // MARK: - Navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        
-        let targetController: CarDetailsViewController = segue.destinationViewController as! CarDetailsViewController
-        
-        if let tableCell: UITableViewCell = sender as? UITableViewCell {
-            if let selectedIndex: NSIndexPath! = self.tableView.indexPathForCell(tableCell) {
-                targetController.car = self.carData[selectedIndex!.item]
-            }
-        } else if let annotation: MKAnnotation = sender as? MKAnnotation {
-            if let car = annotation as? CarData {
-                targetController.car = car
+        if(segue.destinationViewController.isKindOfClass(CarDetailsViewController)){
+            let targetController: CarDetailsViewController = segue.destinationViewController as! CarDetailsViewController
+            
+            if let tableCell: UITableViewCell = sender as? UITableViewCell {
+                if let selectedIndex: NSIndexPath! = self.tableView.indexPathForCell(tableCell) {
+                    targetController.car = self.carData[selectedIndex!.item]
+                }
+            } else if let annotation: MKAnnotation = sender as? MKAnnotation {
+                if let car = annotation as? CarData {
+                    targetController.car = car
+                }
             }
         }
     }
@@ -271,10 +339,11 @@ extension CarBrowseViewController: UITableViewDataSource {
             let url = NSURL(string: (car.thumbnailURL)!)
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
                 let data = NSData(contentsOfURL: url!)
-                
-                dispatch_async(dispatch_get_main_queue()) {
-                    CarBrowseViewController.thumbnailCache[car.thumbnailURL!] = UIImage(data: data!)
-                    cell?.carThumbnail.image = CarBrowseViewController.thumbnailCache[car.thumbnailURL!] as? UIImage
+                if (data != nil){
+                    dispatch_async(dispatch_get_main_queue()) {
+                        CarBrowseViewController.thumbnailCache[car.thumbnailURL!] = UIImage(data: data!)
+                        cell?.carThumbnail.image = CarBrowseViewController.thumbnailCache[car.thumbnailURL!] as? UIImage
+                    }
                 }
             }
         } else {

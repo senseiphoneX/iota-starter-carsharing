@@ -28,8 +28,12 @@ class TripViewController: UIViewController {
     var behaviors = NSMutableDictionary()
     var mapRect: MKMapRect?
     
+    static let MIN_MAP_RECT_WIDTH:Double = 5000
+    static let MIN_MAP_RECT_HEIGHT:Double = 10000
+    
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var mapView: MKMapView!
+    @IBOutlet weak var notAnalyzedLabel: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -58,14 +62,51 @@ class TripViewController: UIViewController {
             titleString = dateformatter.stringFromDate(NSDate(timeIntervalSince1970: Double(time/1000)))
         }
         
-        titleString.appendContentsOf(" (" + String(Int(self.tripData!.duration! / 1000 / 60)) + "min)")
+        let duration: Double? = self.tripData!.duration
+        if (duration != nil){
+            titleString.appendContentsOf(" (" + String(Int(duration! / 1000 / 60)) + "min)")
+        }
         topItem!.title = titleString
         
         super.viewWillAppear(animated)
     }
     
     func getDriverBehavior() {
-        let url: NSURL = NSURL(string: "\(API.tripBehavior)/\(tripData!.trip_uuid!)")!
+        let trip_uuid: String? = tripData!.trip_uuid
+        if(trip_uuid == nil){
+            addStartAndEndToMap()
+            tableView.removeConstraints(tableView.constraints)
+            notAnalyzedLabel.addConstraint(NSLayoutConstraint(
+                item:notAnalyzedLabel,
+                attribute:NSLayoutAttribute.Height,
+                relatedBy:NSLayoutRelation.Equal,
+                toItem:nil,
+                attribute:NSLayoutAttribute.Height,
+                multiplier:1,
+                constant:40
+            ))
+            return
+        }
+        notAnalyzedLabel.addConstraint(NSLayoutConstraint(
+            item:notAnalyzedLabel,
+            attribute:NSLayoutAttribute.Height,
+            relatedBy:NSLayoutRelation.Equal,
+            toItem:nil,
+            attribute:NSLayoutAttribute.Height,
+            multiplier:1,
+            constant:0
+            ))
+        tableView.addConstraint(NSLayoutConstraint(
+            item:tableView,
+            attribute:NSLayoutAttribute.Height,
+            relatedBy:NSLayoutRelation.Equal,
+            toItem:tableView,
+            attribute:NSLayoutAttribute.Width,
+            multiplier:236/375,
+            constant:1
+            ))
+      
+        let url: NSURL = NSURL(string: "\(API.tripBehavior)/\(trip_uuid!)")!
         let request: NSMutableURLRequest = NSMutableURLRequest(URL: url)
         request.HTTPMethod = "GET"
         
@@ -109,17 +150,21 @@ class TripViewController: UIViewController {
     }
     
     func addStartAndEndToMap() {
-        let startAnnotation = MKPointAnnotation()
-        startAnnotation.coordinate = self.startLoc!
-        startAnnotation.title = "Start of Trip"
-        self.mapView.addAnnotation(startAnnotation)
+        if(self.startLoc != nil){
+            let startAnnotation = MKPointAnnotation()
+            startAnnotation.coordinate = self.startLoc!
+            startAnnotation.title = "Start of Trip"
+            self.mapView.addAnnotation(startAnnotation)
+        }
         
-        let endAnnotation = MKPointAnnotation()
-        endAnnotation.coordinate = self.endLoc!
-        endAnnotation.title = "End of Trip"
-        self.mapView.addAnnotation(endAnnotation)
+        if(self.endLoc != nil){
+            let endAnnotation = MKPointAnnotation()
+            endAnnotation.coordinate = self.endLoc!
+            endAnnotation.title = "End of Trip"
+            self.mapView.addAnnotation(endAnnotation)
+        }
         
-        let url: NSURL = NSURL(string: "\(API.tripRoutes)/" + (tripData?.trip_uuid)!)!
+        let url: NSURL = NSURL(string: "\(API.tripRoutes)/" + (tripData?.trip_id)!)!
         let request: NSMutableURLRequest = NSMutableURLRequest(URL: url)
         request.HTTPMethod = "GET"
         
@@ -138,6 +183,14 @@ class TripViewController: UIViewController {
                         
                         self.mapView.addOverlay(polyline)
                         self.mapRect = self.mapView.mapRectThatFits(polyline.boundingMapRect, edgePadding: UIEdgeInsetsMake(50, 50, 50, 50))
+                        if self.mapRect?.size.width < TripViewController.MIN_MAP_RECT_WIDTH {
+                            self.mapRect?.size.width = TripViewController.MIN_MAP_RECT_WIDTH
+                            self.mapRect?.origin.x = (self.mapRect?.origin.x)! - TripViewController.MIN_MAP_RECT_WIDTH/2
+                        }
+                        if self.mapRect?.size.height < TripViewController.MIN_MAP_RECT_HEIGHT {
+                            self.mapRect?.size.height = TripViewController.MIN_MAP_RECT_HEIGHT
+                            self.mapRect?.origin.y = (self.mapRect?.origin.y)! - TripViewController.MIN_MAP_RECT_HEIGHT/2
+                        }
 
                         self.mapView.setVisibleMapRect(self.mapRect!, animated: true)
                     })

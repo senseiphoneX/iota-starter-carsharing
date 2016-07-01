@@ -55,10 +55,10 @@ class QRCodeReaderViewController: UIViewController, AVCaptureMetadataOutputObjec
         if (error != nil) {
             let alert = UIAlertController(title: "No camera detected",
                   message: "Enter the route to the server", preferredStyle: .Alert)
-            
-            var routeTextField: UITextField?
-            
+
             // Add the text field for entering the route manually
+            var routeTextField: UITextField?
+
             alert.addTextFieldWithConfigurationHandler { textField in
                 routeTextField = textField
                 routeTextField?.placeholder = NSLocalizedString("Route", comment: "")
@@ -67,20 +67,38 @@ class QRCodeReaderViewController: UIViewController, AVCaptureMetadataOutputObjec
                 }
             }
 
+            // Add the text field for entering the GUID manually
+            var guidTextField: UITextField?
+
+            alert.addTextFieldWithConfigurationHandler { textField in
+                guidTextField = textField
+                guidTextField?.placeholder = NSLocalizedString("App GUID", comment: "")
+                if let appGUID: String = NSUserDefaults.standardUserDefaults().valueForKey("appGUID") as? String {
+                    guidTextField?.text = appGUID
+                }
+            }
+
+
             // Create the actions.
             let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel) { action in
-                NSUserDefaults.standardUserDefaults().setValue(nil, forKey: "appRoute")
                 self.navigationController?.popViewControllerAnimated(true)
             }
             
             let okAction = UIAlertAction(title: "OK", style: .Default) { action in
                 let appRoute = routeTextField?.text
-                if appRoute != "" {
-                    NSUserDefaults.standardUserDefaults().setValue(appRoute, forKey: "appRoute")
+                let appGUID = guidTextField?.text
+                let userDefaults = NSUserDefaults.standardUserDefaults()
+                if appRoute != "" && appGUID != "" {
+                    userDefaults.setValue(appRoute, forKey: "appRoute")
+                    userDefaults.setValue(appGUID, forKey: "appGUID")
+                    // if use customAuth then uncomment setValue and comment out removeObjetForKey
+                    //userDefaults.setValue("true", forKey: "customAuth")
+                    userDefaults.removeObjectForKey("customAuth")
                 }
+                userDefaults.synchronize()
                 self.navigationController?.popViewControllerAnimated(true)
             }
-            
+
             // Add the actions.
             alert.addAction(cancelAction)
             alert.addAction(okAction)
@@ -127,13 +145,33 @@ class QRCodeReaderViewController: UIViewController, AVCaptureMetadataOutputObjec
             if objMetadataMachineReadableCodeObject.stringValue != nil {
                 let fullString = objMetadataMachineReadableCodeObject.stringValue.componentsSeparatedByString(",")
                 
-                if fullString.count >= 2 && fullString[0] == "1" {
-                    
-                    let appRoute = fullString[1]
-                    
-                    NSUserDefaults.standardUserDefaults().setValue(appRoute, forKey: "appRoute")
-                } else {
-                    NSUserDefaults.standardUserDefaults().setValue(fullString, forKey: "appRoute")
+                if fullString[0] == "1" {
+                    switch (fullString.count) {
+                    case 2:
+                        let appRoute = fullString[1]
+                        NSUserDefaults.standardUserDefaults().setValue(appRoute, forKey: "appRoute")
+                        NSUserDefaults.standardUserDefaults().removeObjectForKey("appGUID")
+                        NSUserDefaults.standardUserDefaults().removeObjectForKey("customAuth")
+                        break;
+                    case 3:
+                        let appRoute = fullString[1]
+                        let appGUID = fullString[2]
+                        NSUserDefaults.standardUserDefaults().setValue(appRoute, forKey: "appRoute")
+                        NSUserDefaults.standardUserDefaults().setValue(appGUID, forKey: "appGUID")
+                        NSUserDefaults.standardUserDefaults().removeObjectForKey("customAuth")
+                        break;
+                    case 4:
+                        let appRoute = fullString[1]
+                        let appGUID = fullString[2]
+                        let customAuth = fullString[3]
+                        NSUserDefaults.standardUserDefaults().setValue(appRoute, forKey: "appRoute")
+                        NSUserDefaults.standardUserDefaults().setValue(appGUID, forKey: "appGUID")
+                        NSUserDefaults.standardUserDefaults().setValue(customAuth, forKey: "customAuth")
+                        break;
+                    default:
+                        break;
+                    }
+                    NSUserDefaults.standardUserDefaults().synchronize()
                 }
             }
         }

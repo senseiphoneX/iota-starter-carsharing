@@ -31,6 +31,9 @@ class CreateReservationViewController: UIViewController {
     @IBOutlet weak var locationButton: UIButton!
     @IBOutlet weak var totalTimeLabel: UILabel!
     @IBOutlet weak var totalBillLabel: UILabel!
+    @IBOutlet weak var typeLabel: UILabel!
+    @IBOutlet weak var driveLabel: UILabel!
+    @IBOutlet weak var adviceLabel: UILabel!
     
     @IBOutlet weak var carReserveThumbnail: UIImageView!
     
@@ -53,13 +56,16 @@ class CreateReservationViewController: UIViewController {
         let dateFormatter = NSDateFormatter()
         dateFormatter.dateStyle = NSDateFormatterStyle.MediumStyle
         dateFormatter.timeStyle = NSDateFormatterStyle.ShortStyle
-        pickupDate = NSDate()
-        dropoffDate = NSDate(timeIntervalSince1970: NSDate().timeIntervalSince1970 + 20000)
+        pickupDate = NSDate(timeIntervalSinceNow: ReservationUtils.DEFAULT_PICKUP_TIME_OFFSET)
+        pickupDate = NSDate(timeIntervalSince1970: CreateReservationViewController.round10Min(pickupDate!.timeIntervalSince1970))
+        dropoffDate = NSDate(timeIntervalSinceNow: ReservationUtils.DEFAULT_DROPOFF_TIME_OFFSET)
+        dropoffDate = NSDate(timeIntervalSince1970: CreateReservationViewController.round10Min(dropoffDate!.timeIntervalSince1970))
         pickupTextField.text = dateFormatter.stringFromDate(pickupDate!)
         dropoffTextField.text = dateFormatter.stringFromDate(dropoffDate!)
 
         // Do any additional setup after loading the view.
-        setupDatePicker()
+        setupDatePicker(pickupTextField, offsetTime: (pickupDate?.timeIntervalSinceNow)!)
+        setupDatePicker(dropoffTextField, offsetTime: (dropoffDate?.timeIntervalSinceNow)!)
         
         carNameLabel.text = car?.name
         
@@ -84,6 +90,15 @@ class CreateReservationViewController: UIViewController {
         
         pickupTextField.leftViewMode = UITextFieldViewMode.Always
         dropoffTextField.leftViewMode = UITextFieldViewMode.Always
+        
+        typeLabel.text = car?.type
+        driveLabel.text = car?.drive
+        
+        if (car?.rateCauseLong == nil) {
+            adviceLabel.text = "none"
+        } else {
+            adviceLabel.text = car?.rateCauseLong
+        }
         
         calculateTime()
     }
@@ -124,14 +139,25 @@ class CreateReservationViewController: UIViewController {
         request.HTTPMethod = "POST"
         
         let carId = car?.deviceID!
-        let pickupTime = pickupDate?.timeIntervalSince1970
-        let dropoffTime = dropoffDate?.timeIntervalSince1970
-        let params = "carId=\(carId!)&pickupTime=\(pickupTime!)&dropOffTime=\(dropoffTime!)"
+        let pickupTime = (pickupDate?.timeIntervalSince1970)!
+        let dropoffTime = (dropoffDate?.timeIntervalSince1970)!
+        var params = "carId=\(carId!)&pickupTime=\(pickupTime)&dropOffTime=\(dropoffTime)"
+        if let deviceId = NotificationUtils.getDeviceId() {
+            params += "&deviceId=\(deviceId)"
+        }
         request.HTTPBody = params.dataUsingEncoding(NSUTF8StringEncoding)
         
         API.doRequest(request, callback: reserveCarActionCallback)
     }
-    
+    static func round10Min(time:NSTimeInterval)->NSTimeInterval{
+        let date = NSDate(timeIntervalSince1970: time)
+        let cal = NSCalendar(identifier: NSCalendarIdentifierGregorian)
+        let components = cal?.components([.Year, .Month, .Day, .Hour, .Minute], fromDate:date)
+        components?.minute = ((components?.minute)!/10)*10
+        components?.second = 0
+        return (cal?.dateFromComponents(components!)?.timeIntervalSince1970)!
+    }
+
     func reserveCarActionCallback(httpResponse: NSHTTPURLResponse, jsonArray: [NSDictionary]) {
         let statusCode = httpResponse.statusCode
         var title = ""
@@ -141,7 +167,9 @@ class CreateReservationViewController: UIViewController {
             title = "Reservation successful"
             CarBrowseViewController.userReserved = true
             ReservationsViewController.userReserved = true
-            
+            if jsonArray.count > 0, let reservationId = jsonArray[0]["reservationId"] as? String {
+                ReservationUtils.getReservation(reservationId, callback: ReservationUtils.setPickupNotification)
+            }
             break
         case 409:
             title = "Car already taken"
@@ -173,16 +201,19 @@ class CreateReservationViewController: UIViewController {
         })
     }
     
-    func setupDatePicker() {
+    func setupDatePicker(textField:UITextField, offsetTime: NSTimeInterval) {
         let datePicker: UIDatePicker = UIDatePicker()
         datePicker.backgroundColor = UIColor.whiteColor()
         datePicker.datePickerMode = UIDatePickerMode.DateAndTime
         datePicker.minuteInterval = 10
         datePicker.addTarget(self, action: #selector(self.datePickerValueChanged),
             forControlEvents: UIControlEvents.ValueChanged)
-        
-        pickupTextField.inputView = datePicker
-        dropoffTextField.inputView = datePicker
+        datePicker.date = NSDate(timeIntervalSince1970: CreateReservationViewController.round10Min(NSDate().timeIntervalSince1970 + offsetTime))
+        textField.inputView = datePicker
+        let dateFormatter = NSDateFormatter()
+        dateFormatter.dateStyle = NSDateFormatterStyle.MediumStyle
+        dateFormatter.timeStyle = NSDateFormatterStyle.ShortStyle
+        textField.text = dateFormatter.stringFromDate(datePicker.date)
         
         let pickerToolbar = UIToolbar()
         pickerToolbar.barStyle = UIBarStyle.BlackTranslucent
@@ -193,8 +224,7 @@ class CreateReservationViewController: UIViewController {
         let cancelButtonPicker = UIBarButtonItem(title: "Done", style: UIBarButtonItemStyle.Plain, target: self, action: #selector(self.cancelDatePicker))
         pickerToolbar.setItems([cancelButtonPicker, spaceButtonPicker], animated: false)
         pickerToolbar.userInteractionEnabled = true
-        dropoffTextField.inputAccessoryView = pickerToolbar
-        pickupTextField.inputAccessoryView = pickerToolbar
+        textField.inputAccessoryView = pickerToolbar
     }
     
     func datePickerValueChanged(sender: UIDatePicker) {
@@ -254,5 +284,4 @@ class CreateReservationViewController: UIViewController {
         // Pass the selected object to the new view controller.
     }
     */
-
 }

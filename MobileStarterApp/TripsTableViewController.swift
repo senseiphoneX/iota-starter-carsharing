@@ -48,7 +48,7 @@ class TripsTableViewController: UIViewController {
     }
 
     func getTrips() {
-        let url = NSURL(string: "\(API.tripBehavior)")!
+        let url = NSURL(string: "\(API.tripBehavior)?all=true")!
         let request: NSMutableURLRequest = NSMutableURLRequest(URL: url)
         request.HTTPMethod = "GET"
         
