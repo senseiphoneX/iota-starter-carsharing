@@ -52,14 +52,15 @@ struct API {
     }
     
     static func doInitialize() {
-        let userDefaults = NSUserDefaults.standardUserDefaults()
-        if let appRoute = userDefaults.valueForKey("appRoute") as? String,
-            let appGUID = userDefaults.valueForKey("appGUID") as? String,
-            let customAuth = userDefaults.valueForKey("customAuth") as? String {
-            connectedAppURL = appRoute
-            connectedAppGUID = appGUID
-            connectedCustomAuth = customAuth
+        let appRoute = userDefaults.valueForKey("appRoute") as? String
+        let appGUID = userDefaults.valueForKey("appGUID") as? String
+        let customAuth = userDefaults.valueForKey("customAuth") as? String
+        if(appRoute != nil){
+            connectedAppURL = appRoute!
+            connectedAppGUID = appGUID == nil ? "" : appGUID!
+            connectedCustomAuth = customAuth == nil ? "false" : customAuth!
         }
+
         if connectedCustomAuth == "true" {
             print("initialize and set up MCA")
             BMSClient.sharedInstance.initializeWithBluemixAppRoute(connectedAppURL, bluemixAppGUID: connectedAppGUID, bluemixRegion: bmRegion)
