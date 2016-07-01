@@ -52,6 +52,7 @@ struct API {
     }
     
     static func doInitialize() {
+        let userDefaults = NSUserDefaults.standardUserDefaults()
         let appRoute = userDefaults.valueForKey("appRoute") as? String
         let appGUID = userDefaults.valueForKey("appGUID") as? String
         let customAuth = userDefaults.valueForKey("customAuth") as? String
