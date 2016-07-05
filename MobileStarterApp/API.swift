@@ -156,10 +156,6 @@ struct API {
             
             let responseString = NSString(data: data!, encoding: NSUTF8StringEncoding)
             print("responseString = \(responseString!)")
-            if !checkAPIVersion(response as! NSHTTPURLResponse) {
-                doHandleError("API Version Error", message: "API version between the server and mobile app is inconsistent. Please upgrade your server or mobile app.", moveToRoot: true)
-                return;
-            }
             
             var jsonArray: [NSMutableDictionary] = []
             do {
@@ -196,6 +192,12 @@ struct API {
             case 500..<600:
                 self.handleServerError(data!, response: (response as? NSHTTPURLResponse)!)
                 break
+            case 200..<400:
+                if !checkAPIVersion(response as! NSHTTPURLResponse) {
+                    doHandleError("API Version Error", message: "API version between the server and mobile app is inconsistent. Please upgrade your server or mobile app.", moveToRoot: true)
+                    return;
+                }
+                fallthrough
             default:
                 callback?((response as? NSHTTPURLResponse)!, jsonArray)
             }

@@ -70,6 +70,11 @@ class UserOwnedCarViewController: UIViewController, CLLocationManagerDelegate {
         let lat = locationManager.location?.coordinate.latitude
         let lng = locationManager.location?.coordinate.longitude
         
+        if (lat == nil || lng == nil) {
+            API.doHandleError("Location Required", message: "Cannot get the current location. Check setting of Location Services.", moveToRoot: true)
+            return
+        }
+        
         let carInfo: NSDictionary = [
             "deviceID": ViewController.mobileAppDeviceId,
             "name": "User owened car",
@@ -96,7 +101,7 @@ class UserOwnedCarViewController: UIViewController, CLLocationManagerDelegate {
         self.pickupTime = NSDate().timeIntervalSince1970
         self.dropoffTime = NSDate().timeIntervalSince1970 + 3600
         
-        var params = "carId=\((carData!.deviceID)!)&pickupTime=\(self.pickupTime!)&dropOffTime=\(self.dropoffTime!)"
+        var params = "carId=\(carId)&pickupTime=\(self.pickupTime!)&dropOffTime=\(self.dropoffTime!)"
         if let deviceId = NotificationUtils.getDeviceId() {
             params += "&deviceId=\(deviceId)"
         }
@@ -129,12 +134,15 @@ class UserOwnedCarViewController: UIViewController, CLLocationManagerDelegate {
                 self.reservations = ReservationsData.fromDictionary(jsonArray)
                 
                 for reservation in self.reservations! {
-                    if (reservation.type != nil && reservation.type == "UserOwnedCarDevice" && (reservation.pickupTime <= self.pickupTime && reservation.dropOffTime >= self.pickupTime) || (reservation.dropOffTime >= self.pickupTime && reservation.dropOffTime <= self.dropoffTime)) {
-                        self.completeReservation(reservation._id!, alreadyTaken: true)
-                        
-                        dispatch_async(dispatch_get_main_queue(), {
-                            self.initiateCar()
-                        })
+                    if (reservation.carId == ViewController.mobileAppDeviceId) {
+                        if(reservation.status == "driving"){
+                            self.completeReservation(reservation._id!, alreadyTaken: true)
+                            dispatch_async(dispatch_get_main_queue(), {
+                                self.initiateCar()
+                            })
+                        }else{
+                                self.reservationId = reservation._id!
+                        }
                     }
                 }
             })
@@ -185,6 +193,8 @@ class UserOwnedCarViewController: UIViewController, CLLocationManagerDelegate {
                     "customAuth": API.connectedCustomAuth
                 ])
                 ViewController.completeDrive(carData.deviceID);
+                // reserve for the next trip
+                self.initiateCar();
                 break
             default:
                 title = "Something went wrong."
@@ -202,6 +212,17 @@ class UserOwnedCarViewController: UIViewController, CLLocationManagerDelegate {
                     self.presentViewController(alert, animated: true, completion: nil)
                 })
             }
+        }
+    }
+    
+    func cancelReservation(reservationId: String) {
+        let url = NSURL(string: "\(API.reservation)/\(reservationId)")!
+        let request = NSMutableURLRequest(URL: url)
+        
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.HTTPMethod = "DELETE"
+        
+        API.doRequest(request) { (httpResponse, jsonArray) -> Void in
         }
     }
     

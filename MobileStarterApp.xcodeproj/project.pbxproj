@@ -43,8 +43,8 @@
 		614FADC21CDA46AC00FACFA8 /* Path.swift in Sources */ = {isa = PBXBuildFile; fileRef = 614FADC11CDA46AC00FACFA8 /* Path.swift */; };
 		619A27171D089457007BCDCA /* FilterModalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 619A27161D089457007BCDCA /* FilterModalViewController.swift */; };
 		61F9494E1D2591C900AF5CF7 /* UserOwnedCarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61F9494D1D2591C900AF5CF7 /* UserOwnedCarViewController.swift */; };
-		702CA8FB1D1833B0005937FC /* ReservationUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 702CA8FA1D1833B0005937FC /* ReservationUtils.swift */; };
 		705AC6F11D0ACFFC002C24C4 /* NotificationUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 705AC6F01D0ACFFC002C24C4 /* NotificationUtils.swift */; };
+		8012086B1D2A570C00E552EE /* ReservationUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8012086A1D2A570C00E552EE /* ReservationUtils.swift */; };
 		807D2A391D118A35001FBDD6 /* CustomAuthDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 807D2A381D118A35001FBDD6 /* CustomAuthDelegate.swift */; };
 		83F5193D8B54B00C88A094FE /* Pods_MobilityStarterApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28D7D072EF9A94AC8E54D2A0 /* Pods_MobilityStarterApp.framework */; };
 /* End PBXBuildFile section */
@@ -89,8 +89,8 @@
 		614FADC11CDA46AC00FACFA8 /* Path.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Path.swift; sourceTree = "<group>"; };
 		619A27161D089457007BCDCA /* FilterModalViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterModalViewController.swift; sourceTree = "<group>"; };
 		61F9494D1D2591C900AF5CF7 /* UserOwnedCarViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserOwnedCarViewController.swift; sourceTree = "<group>"; };
-		702CA8FA1D1833B0005937FC /* ReservationUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReservationUtils.swift; sourceTree = "<group>"; };
 		705AC6F01D0ACFFC002C24C4 /* NotificationUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationUtils.swift; sourceTree = "<group>"; };
+		8012086A1D2A570C00E552EE /* ReservationUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ReservationUtils.swift; path = MobileStarterApp/ReservationUtils.swift; sourceTree = "<group>"; };
 		807D2A381D118A35001FBDD6 /* CustomAuthDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomAuthDelegate.swift; sourceTree = "<group>"; };
 		926152C1835324B31CA17C96 /* Pods-MobilityStarterApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MobilityStarterApp.debug.xcconfig"; path = "Pods/Target Support Files/Pods-MobilityStarterApp/Pods-MobilityStarterApp.debug.xcconfig"; sourceTree = "<group>"; };
 		B856EBD2E12765539912014C /* Pods-MobilityStarterApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MobilityStarterApp.release.xcconfig"; path = "Pods/Target Support Files/Pods-MobilityStarterApp/Pods-MobilityStarterApp.release.xcconfig"; sourceTree = "<group>"; };
@@ -146,7 +146,7 @@
 				0CF699351C852D4300770BBA /* ReservationsViewController.swift */,
 				0CF6993B1C855FE500770BBA /* ReservationsTableViewCell.swift */,
 				0CF6993D1C856D3500770BBA /* CompleteReservationViewController.swift */,
-				702CA8FA1D1833B0005937FC /* ReservationUtils.swift */,
+				8012086A1D2A570C00E552EE /* ReservationUtils.swift */,
 			);
 			name = "Reservations tab";
 			path = ..;
@@ -254,12 +254,15 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0C5896851C7E1CC8003CF841 /* Build configuration list for PBXNativeTarget "MobilityStarterApp" */;
 			buildPhases = (
+				32B0CA21A6242A4D8605DE0C /* 📦 Check Pods Manifest.lock */,
 				29FE454FC4CB5EC21F9BB959 /* [CP] Check Pods Manifest.lock */,
 				0C58966F1C7E1CC8003CF841 /* Sources */,
 				0C5896701C7E1CC8003CF841 /* Frameworks */,
 				0C5896711C7E1CC8003CF841 /* Resources */,
 				164F2E592FA65FBD8ECD51B4 /* [CP] Embed Pods Frameworks */,
 				952C734D2D6B32BC3073A4CB /* [CP] Copy Pods Resources */,
+				84EE160D1337A5C3B970BB1A /* 📦 Embed Pods Frameworks */,
+				6AABED0FFADF9190E99CB894 /* 📦 Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -349,6 +352,51 @@
 			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
+		32B0CA21A6242A4D8605DE0C /* 📦 Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "📦 Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		6AABED0FFADF9190E99CB894 /* 📦 Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "📦 Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-MobilityStarterApp/Pods-MobilityStarterApp-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		84EE160D1337A5C3B970BB1A /* 📦 Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "📦 Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-MobilityStarterApp/Pods-MobilityStarterApp-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		952C734D2D6B32BC3073A4CB /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -392,7 +440,6 @@
 				0C5B02DC1C80F328006855F7 /* API.swift in Sources */,
 				0CE3CE4F1C86179300C3A254 /* ProfileViewController.swift in Sources */,
 				0C2630DA1CB8A72E00C66188 /* Trip.swift in Sources */,
-				702CA8FB1D1833B0005937FC /* ReservationUtils.swift in Sources */,
 				0C2630E01CB8A72E00C66188 /* BehaviorDuration.swift in Sources */,
 				0CE0B0A81CD159BA00629537 /* QRCodeReaderViewController.swift in Sources */,
 				0CE3CE531C8762FA00C3A254 /* CreateReservationViewController.swift in Sources */,
@@ -405,6 +452,7 @@
 				0C2630DF1CB8A72E00C66188 /* BehaviorTimes.swift in Sources */,
 				0C2630DD1CB8A72E00C66188 /* Scoring.swift in Sources */,
 				619A27171D089457007BCDCA /* FilterModalViewController.swift in Sources */,
+				8012086B1D2A570C00E552EE /* ReservationUtils.swift in Sources */,
 				0CF699361C852D4300770BBA /* ReservationsViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

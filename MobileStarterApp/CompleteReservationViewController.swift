@@ -62,8 +62,17 @@ class CompleteReservationViewController: UIViewController {
                 carNameLabel.text = "unknown name"
             }
         }
-        
-        setLabelsAccordingToStatus()
+
+        dispatch_async(dispatch_get_main_queue(), {
+            self.cancelReservationButton.enabled = false
+            self.unlockButton.enabled = false
+            ReservationUtils.getReservation((self.reservation?._id)!, callback:{(reservation) in
+                self.reservation = reservation
+                dispatch_async(dispatch_get_main_queue(), {
+                    self.setLabelsAccordingToStatus()
+                })
+            })
+        })
         
         calculateDurationLabel()
         
@@ -254,12 +263,15 @@ class CompleteReservationViewController: UIViewController {
                     self.cancelReservationButton.setTitle("Complete Reservation", forState: UIControlState.Normal)
                     self.unlockMessageLabel.text = ""
                 }
+                self.cancelReservationButton.enabled = true
+
                 let carStatus = car.status
                 if carStatus == "Locked" {
                     self.unlockButton.setTitle("Unlock the car", forState: UIControlState.Normal)
                 } else {
                     self.unlockButton.setTitle("Lock the car", forState: UIControlState.Normal)
                 }
+                self.unlockButton.enabled = true
             }
         }
     }

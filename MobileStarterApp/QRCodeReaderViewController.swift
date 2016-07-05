@@ -88,7 +88,7 @@ class QRCodeReaderViewController: UIViewController, AVCaptureMetadataOutputObjec
                 let appRoute = routeTextField?.text
                 let appGUID = guidTextField?.text
                 let userDefaults = NSUserDefaults.standardUserDefaults()
-                if appRoute != "" && appGUID != "" {
+                if appRoute != "" {
                     userDefaults.setValue(appRoute, forKey: "appRoute")
                     userDefaults.setValue(appGUID, forKey: "appGUID")
                     // if use customAuth then uncomment setValue and comment out removeObjetForKey
