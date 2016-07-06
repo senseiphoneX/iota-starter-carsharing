@@ -38,6 +38,19 @@ struct API {
     static var tripRoutes = "\(connectedAppURL)/user/triproutes"
     static var credentials = "\(connectedAppURL)/user/device/credentials"
     
+    static func setURIs(appURL: String) {
+        carsNearby = "\(appURL)/user/carsnearby"
+        reservation = "\(appURL)/user/reservation"
+        reservations = "\(appURL)/user/activeReservations"
+        carControl = "\(appURL)/user/carControl"
+        driverStats = "\(appURL)/user/driverInsights/statistics"
+        trips = "\(appURL)/user/driverInsights"
+        tripBehavior = "\(appURL)/user/driverInsights/behaviors"
+        latestTripBehavior = "\(appURL)/user/driverInsights/behaviors/latest"
+        tripRoutes = "\(appURL)/user/triproutes"
+        credentials = "\(appURL)/user/device/credentials"
+    }
+    
     static func delegateCustomAuthHandler() -> Void {
         let delegate = CustomAuthDelegate()
         let mcaAuthManager = MCAAuthorizationManager.sharedInstance
@@ -60,6 +73,7 @@ struct API {
             connectedAppURL = appRoute!
             connectedAppGUID = appGUID == nil ? "" : appGUID!
             connectedCustomAuth = customAuth == nil ? "false" : customAuth!
+            setURIs(connectedAppURL)
         }
 
         if connectedCustomAuth == "true" {

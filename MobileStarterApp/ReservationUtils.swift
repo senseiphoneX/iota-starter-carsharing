@@ -68,12 +68,17 @@ class ReservationUtils {
             dispatch_async(dispatch_get_main_queue(), {
                 // Need to modify layout in main thread
                 let window = UIApplication.sharedApplication().keyWindow
-                let tabBarController = window?.rootViewController?.childViewControllers[1] as! UITabBarController
-                tabBarController.navigationController?.popToViewController(tabBarController, animated: true)
-                tabBarController.selectedIndex = TAB_INDEX_RESERVATION
-                if reservation.carDetails != nil {
-                    let reservationsVC = tabBarController.selectedViewController as! ReservationsViewController
-                    reservationsVC.performSegueWithIdentifier("editReservationSegue", sender: reservation)
+                // Assume first tabbarcontroller is main ui
+                for vc in (window?.rootViewController?.childViewControllers)! {
+                    if let tabBarController = vc as? UITabBarController {
+                        tabBarController.navigationController?.popToViewController(tabBarController, animated: true)
+                        tabBarController.selectedIndex = TAB_INDEX_RESERVATION
+                        if reservation.carDetails != nil {
+                            let reservationsVC = tabBarController.selectedViewController as! ReservationsViewController
+                            reservationsVC.performSegueWithIdentifier("editReservationSegue", sender: reservation)
+                        }
+                        break
+                    }
                 }
             })
         })

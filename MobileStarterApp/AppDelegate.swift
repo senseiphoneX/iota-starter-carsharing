@@ -125,7 +125,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     func specifyServer(appRoute:String, appGUID:String, customAuth:String){
         let userDefaults = NSUserDefaults.standardUserDefaults()
-        if appRoute != "" && appGUID != "" {
+        if appRoute != "" {
             userDefaults.setValue(appRoute, forKey: "appRoute")
             userDefaults.setValue(appGUID, forKey: "appGUID")
             if customAuth == "true" {

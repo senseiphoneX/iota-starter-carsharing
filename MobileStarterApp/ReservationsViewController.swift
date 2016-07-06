@@ -101,10 +101,11 @@ extension ReservationsViewController: UITableViewDataSource {
             
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
                 let data = NSData(contentsOfURL: url!)
-                
-                dispatch_async(dispatch_get_main_queue()) {
-                    CarBrowseViewController.thumbnailCache[(reservation.carDetails?.thumbnailURL)!] = UIImage(data: data!)
-                    cell.carReservationThumbnail.image = CarBrowseViewController.thumbnailCache[(reservation.carDetails?.thumbnailURL)!] as? UIImage
+                if data != nil {
+                    dispatch_async(dispatch_get_main_queue()) {
+                        CarBrowseViewController.thumbnailCache[(reservation.carDetails?.thumbnailURL)!] = UIImage(data: data!)
+                        cell.carReservationThumbnail.image = CarBrowseViewController.thumbnailCache[(reservation.carDetails?.thumbnailURL)!] as? UIImage
+                    }
                 }
             }
         } else {

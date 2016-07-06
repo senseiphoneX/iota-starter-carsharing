@@ -75,7 +75,9 @@ class SpecifyServerViewController: UIViewController {
         }
     }
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        let target :UITabBarController? = segue.destinationViewController as? UITabBarController
         if(segue.identifier == "goToHomeScreen"){
+            target?.viewControllers!.removeAtIndex(0) // Drive
             ReservationUtils.resetReservationNotifications()
             NotificationUtils.initRemoteNotification()
         }else if(segue.identifier == "goToCodeReader"){
