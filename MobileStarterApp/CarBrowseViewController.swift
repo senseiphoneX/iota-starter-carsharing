@@ -54,8 +54,8 @@ class CarBrowseViewController: UIViewController {
     var locationData = [
         CLLocationCoordinate2D(latitude: 0, longitude: 0),
         CLLocationCoordinate2D(latitude: 35.709026, longitude: 139.731992),
-        CLLocationCoordinate2D(latitude: 36.102118, longitude: -115.165571),
-        CLLocationCoordinate2D(latitude: 36.090754, longitude: -115.176670),
+        CLLocationCoordinate2D(latitude: 36.10073, longitude: -115.168407),
+        CLLocationCoordinate2D(latitude: 36.093247, longitude: -115.176085),
         CLLocationCoordinate2D(latitude: 48.0993, longitude: 11.55848),
         CLLocationCoordinate2D(latitude: 48.176656, longitude: 11.553583)
     ]
@@ -87,7 +87,7 @@ class CarBrowseViewController: UIViewController {
     
     override func viewWillAppear(animated: Bool) {
         self.navigationController?.setNavigationBarHidden(true, animated: false)
-        
+
         if (self.location != nil && CarBrowseViewController.userReserved) {
             clearCarsFromMap(true)
             getCars(self.location!)
@@ -108,6 +108,9 @@ class CarBrowseViewController: UIViewController {
         }
         
         super.viewWillAppear(animated)
+    }
+    @IBAction func onHomeButtonTapped(sender: UIButton) {
+        self.tabBarController?.navigationController?.popToRootViewControllerAnimated(true)
     }
     
     func getCars(location: CLLocationCoordinate2D) {

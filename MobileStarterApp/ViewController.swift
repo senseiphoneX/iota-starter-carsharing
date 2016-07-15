@@ -19,8 +19,6 @@ import CoreLocation
 import CocoaMQTT
 
 class ViewController: UIViewController, CLLocationManagerDelegate {
-    var mqtt: CocoaMQTT?
-
     @IBOutlet weak var smarterMobilityLabel : UILabel!
     @IBOutlet weak var specifyServerButton: UIButton!
     @IBOutlet weak var navigator: UINavigationItem!
@@ -33,20 +31,22 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     // drive using my device
     static var mobileAppDeviceId: String = "d" + API.getUUID().substringToIndex(API.getUUID().startIndex.advancedBy(30))
     static var behaviorDemo: Bool = false
-    static var deviceCredentials: NSDictionary?
-    static var getCredentials: Bool = false
-    static var mqttConnected: Bool = false
-    static var tripID: String? = nil
-    static var userUnlocked: Bool = false
+    private static var needCredentials: Bool = false
+    private static var tripID: String? = nil
+    private static var userUnlocked: Bool = false
+    private static var mqtt: CocoaMQTT?
     
-    static func startDrive(deviceId: String){
+    static func startDrive(deviceId: String)-> Bool{
+        if(ViewController.mqtt == nil){
+            return false
+        }
         if(ViewController.reservationForMyDevice(deviceId)){
-            ViewController.getCredentials = true // reget credentials to be safe
             ViewController.userUnlocked = true
             if(ViewController.tripID == nil){
                 ViewController.tripID = NSUUID().UUIDString
             }
         }
+        return true
     }
 
     static func stopDrive(deviceId: String?){
@@ -74,44 +74,47 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     func locationManager(manager: CLLocationManager, didUpdateToLocation newLocation: CLLocation, fromLocation oldLocation: CLLocation) {
         if (ViewController.behaviorDemo) {
-            if (ViewController.getCredentials) {
+            if (ViewController.mqtt == nil && ViewController.needCredentials) {
                 let url = NSURL(string: "\(API.credentials)/\(ViewController.mobileAppDeviceId)?owneronly=true")!
                 let request = NSMutableURLRequest(URL: url)
                 request.HTTPMethod = "GET"
                 
                 API.doRequest(request) { (httpResponse, jsonArray) -> Void in
+                    if(ViewController.mqtt != nil){
+                        // already got credentials
+                        return;
+                    }
                     if(jsonArray.count == 0){
                         self._console("Failed to get credential. May exceed free plan limit.")
                         ViewController.behaviorDemo = false;
                         return;
                     }
-                    ViewController.deviceCredentials = jsonArray[0]
+                    let deviceCredentials:NSDictionary = jsonArray[0]
                     
                     dispatch_sync(dispatch_get_main_queue(), {
                         print("calling mqttsettings")
                         
-                        let clientIdPid = "d:\((ViewController.deviceCredentials!.objectForKey("org"))!):\((ViewController.deviceCredentials!.objectForKey("deviceType"))!):\((ViewController.deviceCredentials!.objectForKey("deviceId"))!)"
-                        self.mqtt = CocoaMQTT(clientId: clientIdPid, host: "\((ViewController.deviceCredentials!.objectForKey("org"))!).messaging.internetofthings.ibmcloud.com", port: 8883)
+                        let clientIdPid = "d:\((deviceCredentials.objectForKey("org"))!):\((deviceCredentials.objectForKey("deviceType"))!):\((deviceCredentials.objectForKey("deviceId"))!)"
+                        ViewController.mqtt = CocoaMQTT(clientId: clientIdPid, host: "\((deviceCredentials.objectForKey("org"))!).messaging.internetofthings.ibmcloud.com", port: 8883)
                         
-                        if let mqtt = self.mqtt {
+                        if let mqtt = ViewController.mqtt {
                             mqtt.username = "use-token-auth"
-                            mqtt.password = ViewController.deviceCredentials!.objectForKey("token") as? String
+                            mqtt.password = deviceCredentials.objectForKey("token") as? String
                             mqtt.keepAlive = 90
                             mqtt.delegate = self
                             mqtt.secureMQTT = true
                         }
                         
-                        self.mqtt?.connect()
+                        ViewController.mqtt?.connect()
 
                     })
                 }
-                
-                ViewController.getCredentials = false
+                ViewController.needCredentials = false
             }
             
-            if (self.mqtt != nil && ViewController.userUnlocked){
-                if(!ViewController.mqttConnected){
-                    self.mqtt?.connect()
+            if (ViewController.mqtt != nil && ViewController.userUnlocked){
+                if(ViewController.mqtt!.connState == CocoaMQTTConnState.DISCONNECTED){
+                    ViewController.mqtt?.connect()
                 }else{
                     sendLocation(newLocation, oldLocation: oldLocation)
                 }
@@ -120,7 +123,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
     
     func sendLocation(userLocation: CLLocation, oldLocation: CLLocation?) {
-        if(mqtt == nil){
+        if(ViewController.mqtt == nil || ViewController.mqtt!.connState != CocoaMQTTConnState.CONNECTED){
             return;
         }
         let dateFormatter = NSDateFormatter()
@@ -145,7 +148,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         
         let stringData: String = jsonToString(data)
         
-        mqtt!.publish("iot-2/evt/sensorData/fmt/json", withString: stringData)
+        ViewController.mqtt!.publish("iot-2/evt/sensorData/fmt/json", withString: stringData)
     }
     
 
@@ -170,8 +173,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        locationManager.requestWhenInUseAuthorization()
-        locationManager.startUpdatingLocation()
         
         view.backgroundColor = Colors.dark
         
@@ -212,33 +213,17 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     @IBAction func getStartedAction(sender: AnyObject) {
         API.doInitialize()
+        ViewController.behaviorDemo = false
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.stopUpdatingLocation()
     }
     
     @IBAction func driverBehaviorDemoAction(sender: AnyObject) {
         API.doInitialize()
         ViewController.behaviorDemo = true
-        ViewController.getCredentials = true
-        
-        switch CLLocationManager.authorizationStatus(){
-        case .Denied:
-            fallthrough
-        case .Restricted:
-            fallthrough
-        case .NotDetermined:
-            let alert = UIAlertController(title: "Location Required", message: "Using your location, you can analyze your driving.", preferredStyle: .Alert)
-            let okAction = UIAlertAction(title: "Setting", style: .Default) { action -> Void in
-                let url = NSURL(string: UIApplicationOpenSettingsURLString)!
-                UIApplication.sharedApplication().openURL(url)
-            }
-            let cancelAction = UIAlertAction(title: "Don't Allow", style: .Cancel){action -> Void in
-                // do nothing
-            }
-            alert.addAction(okAction)
-            alert.addAction(cancelAction)
-            presentViewController(alert, animated: true, completion: nil)
-        default:
-            break
-        }
+        ViewController.needCredentials = true
+        locationManager.requestAlwaysAuthorization()
+        locationManager.startUpdatingLocation()
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
@@ -264,7 +249,6 @@ extension ViewController: CocoaMQTTDelegate {
     
     func mqtt(mqtt: CocoaMQTT, didConnectAck ack: CocoaMQTTConnAck) {
         print("connected")
-        ViewController.mqttConnected = true;
         sendLocation(locationManager.location!, oldLocation: nil) // initial location
         
         //print("didConnectAck \(ack.rawValue)")
@@ -304,7 +288,6 @@ extension ViewController: CocoaMQTTDelegate {
     
     func mqttDidDisconnect(mqtt: CocoaMQTT, withError err: NSError?) {
         _console("mqttDidDisconnect")
-        ViewController.mqttConnected = false;
     }
     
     func _console(info: String) {

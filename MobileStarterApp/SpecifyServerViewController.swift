@@ -80,6 +80,7 @@ class SpecifyServerViewController: UIViewController {
             target?.viewControllers!.removeAtIndex(0) // Drive
             ReservationUtils.resetReservationNotifications()
             NotificationUtils.initRemoteNotification()
+            ViewController.behaviorDemo = false
         }else if(segue.identifier == "goToCodeReader"){
             serverSpecified = true
         }

@@ -23,7 +23,7 @@ class UserOwnedCarViewController: UIViewController, CLLocationManagerDelegate {
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var drivingButton: UIButton!
-    
+
     let locationManager = CLLocationManager()
     var location: CLLocationCoordinate2D?
     
@@ -41,6 +41,27 @@ class UserOwnedCarViewController: UIViewController, CLLocationManagerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        switch CLLocationManager.authorizationStatus(){
+        case .Denied:
+            fallthrough
+        case .Restricted:
+            fallthrough
+        case .NotDetermined:
+            let alert = UIAlertController(title: "Location Required", message: "Using your location, you can analyze your driving.", preferredStyle: .Alert)
+            let okAction = UIAlertAction(title: "Setting", style: .Default) { action -> Void in
+                let url = NSURL(string: UIApplicationOpenSettingsURLString)!
+                UIApplication.sharedApplication().openURL(url)
+            }
+            let cancelAction = UIAlertAction(title: "Don't Allow", style: .Cancel){action -> Void in
+                // do nothing
+            }
+            alert.addAction(okAction)
+            alert.addAction(cancelAction)
+            presentViewController(alert, animated: true, completion: nil)
+        default:
+            break
+        }
+        
         self.locationManager.delegate = self
         self.tabBarController?.tabBar.hidden = false
         
@@ -56,6 +77,20 @@ class UserOwnedCarViewController: UIViewController, CLLocationManagerDelegate {
         super.viewWillAppear(animated)
         
         self.titleLabel.text = "Press Start Driving when ready"
+    }
+    @IBAction func onHomeButtonTapped(sender: UIButton) {
+        if self.reservationId != nil{
+            let cancelAction = UIAlertAction(title: "No", style: .Cancel, handler: {action -> Void in
+                // do nothing
+            })
+            let okAction = UIAlertAction(title: "Yes", style: .Destructive, handler: {action -> Void in
+                self.completeReservation(self.reservationId!, alreadyTaken: false)
+                self.tabBarController?.navigationController?.popViewControllerAnimated(true)
+            })
+            self.openAlert("Warning", message: "Going back to the home page would complete your current drive. Are you sure?", actions: [cancelAction, okAction])
+        }else{
+            self.tabBarController?.navigationController?.popViewControllerAnimated(true)
+        }
     }
     
     func locationManager(manager: CLLocationManager, didUpdateToLocation newLocation: CLLocation, fromLocation oldLocation: CLLocation) {
@@ -93,9 +128,12 @@ class UserOwnedCarViewController: UIViewController, CLLocationManagerDelegate {
     
     @IBAction func startedDriving(sender: AnyObject) {
         if (!startedDriving) {
-            self.reserveCar()
-            ViewController.startDrive(self.deviceID!)
-            drivingButton.setBackgroundImage(UIImage(named: "endDriving"), forState: UIControlState.Normal)
+            if(ViewController.startDrive(self.deviceID!)){
+                self.reserveCar()
+                drivingButton.setBackgroundImage(UIImage(named: "endDriving"), forState: UIControlState.Normal)
+            }else{
+                self.openAlert("Failed to connect to IoT Platform", message:"", actions:nil)
+            }
         } else {
             startedDriving = false
             self.completeReservation(self.reservationId!, alreadyTaken: false)
@@ -166,6 +204,7 @@ class UserOwnedCarViewController: UIViewController, CLLocationManagerDelegate {
             case 200:
                 title = "Drive completed"
                 message = "Please allow at least 30 minutes for the driver behavior data to be analyzed"
+                self.reservationId = nil
                 break
             default:
                 title = "Something went wrong."
@@ -176,18 +215,27 @@ class UserOwnedCarViewController: UIViewController, CLLocationManagerDelegate {
             })
             
             if (!alreadyTaken) {
-                let alert = UIAlertController(title: title, message: message, preferredStyle: .Alert)
-                
-                let okAction = UIAlertAction(title: "OK", style: .Cancel) { action -> Void in
-                    alert.removeFromParentViewController()
-                }
-                alert.addAction(okAction)
-                
-                dispatch_async(dispatch_get_main_queue(), {
-                    self.presentViewController(alert, animated: true, completion: nil)
-                })
+                self.openAlert(title, message: message, actions: nil)
             }
         }
+    }
+    
+    func openAlert(title: String, message: String, actions: [UIAlertAction]?){
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .Alert)
+        if let _actions:[UIAlertAction] = actions {
+            for action in _actions {
+                alert.addAction(action)
+            }
+        }else{
+            let okAction = UIAlertAction(title: "OK", style: .Cancel) { action -> Void in
+                alert.removeFromParentViewController()
+            }
+            alert.addAction(okAction)
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), {
+            UIApplication.sharedApplication().keyWindow?.rootViewController!.presentViewController(alert, animated: true, completion: nil)
+        })
     }
     
     func cancelReservation(reservationId: String) {

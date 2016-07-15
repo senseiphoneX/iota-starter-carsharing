@@ -327,9 +327,9 @@ extension TripViewController: MKMapViewDelegate {
         let pointAnnotation = annotation as! MKPointAnnotation
         let asRange = pointAnnotation.title?.rangeOfString("Start")
         if let asRange = asRange where asRange.startIndex == pointAnnotation.title?.startIndex {
-            newAnnotation.pinTintColor = MKPinAnnotationView.greenPinColor()
+            newAnnotation.pinColor = .Green
         } else {
-            newAnnotation.pinTintColor = MKPinAnnotationView.redPinColor()
+            newAnnotation.pinColor = .Red
         }
         newAnnotation.animatesDrop = true
         newAnnotation.canShowCallout = true

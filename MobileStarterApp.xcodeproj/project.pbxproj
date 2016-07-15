@@ -254,15 +254,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0C5896851C7E1CC8003CF841 /* Build configuration list for PBXNativeTarget "MobilityStarterApp" */;
 			buildPhases = (
-				32B0CA21A6242A4D8605DE0C /* 📦 Check Pods Manifest.lock */,
 				29FE454FC4CB5EC21F9BB959 /* [CP] Check Pods Manifest.lock */,
 				0C58966F1C7E1CC8003CF841 /* Sources */,
 				0C5896701C7E1CC8003CF841 /* Frameworks */,
 				0C5896711C7E1CC8003CF841 /* Resources */,
 				164F2E592FA65FBD8ECD51B4 /* [CP] Embed Pods Frameworks */,
 				952C734D2D6B32BC3073A4CB /* [CP] Copy Pods Resources */,
-				84EE160D1337A5C3B970BB1A /* 📦 Embed Pods Frameworks */,
-				6AABED0FFADF9190E99CB894 /* 📦 Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -286,6 +283,11 @@
 					0C5896721C7E1CC8003CF841 = {
 						CreatedOnToolsVersion = 7.2;
 						DevelopmentTeam = PP64RT7P8Z;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -350,51 +352,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
-			showEnvVarsInLog = 0;
-		};
-		32B0CA21A6242A4D8605DE0C /* 📦 Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "📦 Check Pods Manifest.lock";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
-			showEnvVarsInLog = 0;
-		};
-		6AABED0FFADF9190E99CB894 /* 📦 Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "📦 Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-MobilityStarterApp/Pods-MobilityStarterApp-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		84EE160D1337A5C3B970BB1A /* 📦 Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "📦 Embed Pods Frameworks";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-MobilityStarterApp/Pods-MobilityStarterApp-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		952C734D2D6B32BC3073A4CB /* [CP] Copy Pods Resources */ = {

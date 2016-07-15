@@ -90,7 +90,7 @@ class ProfileViewController: UIViewController {
                                 ($1 as! NSNumber).compare($0 as! NSNumber)
                             }
 
-                        self.fetchingLabel.text = "Your score is \(Int(round(stat.scoring!.score!))) for \(Int(round(stat.totalDistance!))) miles."
+                        self.fetchingLabel.text = "Your score is \(Int(round(stat.scoring!.score!))) for \(round(stat.totalDistance!/10)/100) km."
                         
                         self.tableView.reloadData()
                     })
@@ -141,7 +141,7 @@ class ProfileViewController: UIViewController {
             }
             value = "\(Int(round(((dict?.valueForKey(key))! as! Double) / totalDistance! * 100)))%"
             if allInfo {
-                value.appendContentsOf(" (\(Int(round(((dict?.valueForKey(key))! as! Double)))) miles)")
+                value.appendContentsOf(" (\(round(((dict?.valueForKey(key))! as! Double)/10)/100) km)")
             }
         }
         return (key, value)

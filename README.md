@@ -28,11 +28,13 @@ This application source code was developed using Xcode 7.3.  To run this app, fo
 
 5. ```$ open MobileStarterApp.xcworkspace```
 
-6. Click the run button at the top left of the Xcode UI.
+6. Set a URL of an instance of **IoT for Automotive Starter Server App** to the _connectedAppURL_ variable in **API.swift** file.
+
+7. Click the run button at the top left of the Xcode UI.
 
 **Note: Please make sure that you are running Xcode 7.3+**
 
-[![](XcodePreview.png)](https://www.youtube.com/watch?v=7CLvEIxQo10 "Instruction Movie")  
+[![](XcodePreview.jpg)](https://www.youtube.com/watch?v=9O5uoPsn0LA "Instructions")  
 
 ### (Optional) Setup Push Notifications
 You can enable push notifications to the mobile app when the weather at the drop off time of your car reservation becomes bad. Follow the steps below to make the Push Notifications ready for use. See [Push Notifications](https://console.ng.bluemix.net/docs/services/mobilepush/t_push_provider_ios.html) for more information.
@@ -79,6 +81,10 @@ See [IoT for Automotive Starter app]( https://github.com/ibm-watson-iot/iota-sta
 ----
 ## Report Bugs
 If you find a bug, please report it using the [Issues section](https://github.com/ibm-watson-iot/iota-starter-carsharing/issues).
+
+----
+## Privacy Notice
+The IoT for Automotive Starter app on Bluemix stores your driving history obtained using this Mobile App.
 
 ----
 ## Useful links

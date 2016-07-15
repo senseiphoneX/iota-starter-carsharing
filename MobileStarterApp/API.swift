@@ -75,7 +75,6 @@ struct API {
             connectedCustomAuth = customAuth == nil ? "false" : customAuth!
             setURIs(connectedAppURL)
         }
-
         if connectedCustomAuth == "true" {
             print("initialize and set up MCA")
             BMSClient.sharedInstance.initializeWithBluemixAppRoute(connectedAppURL, bluemixAppGUID: connectedAppGUID, bluemixRegion: bmRegion)
