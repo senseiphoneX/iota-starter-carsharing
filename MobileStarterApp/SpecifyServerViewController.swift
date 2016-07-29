@@ -65,6 +65,7 @@ class SpecifyServerViewController: UIViewController {
         NSUserDefaults.standardUserDefaults().removeObjectForKey("appRoute")
         NSUserDefaults.standardUserDefaults().removeObjectForKey("appGUID")
         NSUserDefaults.standardUserDefaults().removeObjectForKey("customAuth")
+        API.setDefaultServer()
         API.doInitialize()
     }
 
@@ -78,7 +79,6 @@ class SpecifyServerViewController: UIViewController {
         let target :UITabBarController? = segue.destinationViewController as? UITabBarController
         if(segue.identifier == "goToHomeScreen"){
             target?.viewControllers!.removeAtIndex(0) // Drive
-            ReservationUtils.resetReservationNotifications()
             NotificationUtils.initRemoteNotification()
             ViewController.behaviorDemo = false
         }else if(segue.identifier == "goToCodeReader"){

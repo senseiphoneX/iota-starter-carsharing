@@ -222,6 +222,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         API.doInitialize()
         ViewController.behaviorDemo = true
         ViewController.needCredentials = true
+        locationManager.allowsBackgroundLocationUpdates = true
         locationManager.requestAlwaysAuthorization()
         locationManager.startUpdatingLocation()
     }
@@ -230,7 +231,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         let target :UITabBarController? = segue.destinationViewController as? UITabBarController
         if(segue.identifier == "showHomeTab"){
             target?.viewControllers!.removeAtIndex(0) // Drive
-            ReservationUtils.resetReservationNotifications()
             NotificationUtils.initRemoteNotification()
         } else if(segue.identifier == "showDriveTab"){
             target?.viewControllers!.removeAtIndex(1) // Home

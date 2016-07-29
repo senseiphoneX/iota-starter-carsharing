@@ -19,7 +19,7 @@
 import UIKit
 import CoreLocation
 
-class ReservationsViewController: UIViewController {
+class ReservationsViewController: UIViewController, MessageViewController {
 
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var tableView: UITableView!
@@ -34,13 +34,19 @@ class ReservationsViewController: UIViewController {
         
         tableView.backgroundColor = UIColor.whiteColor()
         headerView.backgroundColor = Colors.dark
-        
+
+        self.titleLabel.text = "Fetching reservations..."
+
         if (ReservationsViewController.userReserved || self.reservations.count == 0) {
             ReservationsViewController.userReserved = false
             getReservations()
         }
     }
-    
+
+    func setMessage(text: String) {
+        self.titleLabel.text = text
+    }
+
     func getReservations() {
         let url = NSURL(string: API.reservations)!
         let request = NSMutableURLRequest(URL: url)

@@ -46,6 +46,7 @@
 		705AC6F11D0ACFFC002C24C4 /* NotificationUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 705AC6F01D0ACFFC002C24C4 /* NotificationUtils.swift */; };
 		8012086B1D2A570C00E552EE /* ReservationUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8012086A1D2A570C00E552EE /* ReservationUtils.swift */; };
 		807D2A391D118A35001FBDD6 /* CustomAuthDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 807D2A381D118A35001FBDD6 /* CustomAuthDelegate.swift */; };
+		80C148FD1D47781C009FEBB8 /* MessageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C148FC1D47781C009FEBB8 /* MessageViewController.swift */; };
 		83F5193D8B54B00C88A094FE /* Pods_MobilityStarterApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28D7D072EF9A94AC8E54D2A0 /* Pods_MobilityStarterApp.framework */; };
 /* End PBXBuildFile section */
 
@@ -92,6 +93,7 @@
 		705AC6F01D0ACFFC002C24C4 /* NotificationUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationUtils.swift; sourceTree = "<group>"; };
 		8012086A1D2A570C00E552EE /* ReservationUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ReservationUtils.swift; path = MobileStarterApp/ReservationUtils.swift; sourceTree = "<group>"; };
 		807D2A381D118A35001FBDD6 /* CustomAuthDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomAuthDelegate.swift; sourceTree = "<group>"; };
+		80C148FC1D47781C009FEBB8 /* MessageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageViewController.swift; sourceTree = "<group>"; };
 		926152C1835324B31CA17C96 /* Pods-MobilityStarterApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MobilityStarterApp.debug.xcconfig"; path = "Pods/Target Support Files/Pods-MobilityStarterApp/Pods-MobilityStarterApp.debug.xcconfig"; sourceTree = "<group>"; };
 		B856EBD2E12765539912014C /* Pods-MobilityStarterApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MobilityStarterApp.release.xcconfig"; path = "Pods/Target Support Files/Pods-MobilityStarterApp/Pods-MobilityStarterApp.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -209,6 +211,7 @@
 				0C344D801CC567540017D370 /* Profile tab */,
 				0C344D811CC567660017D370 /* Trips tab */,
 				0C2630D21CB8A6E100C66188 /* ConnectedDriverAPI */,
+				80C148FC1D47781C009FEBB8 /* MessageViewController.swift */,
 			);
 			path = MobileStarterApp;
 			sourceTree = "<group>";
@@ -386,6 +389,7 @@
 				0C5B02D41C7E7617006855F7 /* CarData.swift in Sources */,
 				0C5B02DA1C800BAB006855F7 /* CarDetailsViewController.swift in Sources */,
 				0C5896771C7E1CC8003CF841 /* AppDelegate.swift in Sources */,
+				80C148FD1D47781C009FEBB8 /* MessageViewController.swift in Sources */,
 				0C2630E21CBD4F1C00C66188 /* TripViewController.swift in Sources */,
 				705AC6F11D0ACFFC002C24C4 /* NotificationUtils.swift in Sources */,
 				0C24B80C1C7E54960073ADF2 /* CarBrowseViewController.swift in Sources */,
@@ -512,6 +516,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -529,6 +534,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};

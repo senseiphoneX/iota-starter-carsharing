@@ -20,12 +20,16 @@ import BMSCore
 import BMSSecurity
 
 struct API {
-    
-    static var connectedAppURL = "https://iota-starter-server.mybluemix.net"
-    static var connectedAppGUID = ""
-    static var connectedCustomAuth = "" // non-MCA server
+
+    static let defaultAppURL = "https://iota-starter-server.mybluemix.net"
+    static let defaultAppGUID = ""
+    static var defaultCustomAuth = "" // non-MCA server
     static var bmRegion = BMSClient.REGION_US_SOUTH
     static var customRealm = "custauth"
+
+    static var connectedAppURL = defaultAppURL
+    static var connectedAppGUID = defaultAppGUID
+    static var connectedCustomAuth = defaultCustomAuth
     
     static var carsNearby = "\(connectedAppURL)/user/carsnearby"
     static var reservation = "\(connectedAppURL)/user/reservation"
@@ -36,8 +40,9 @@ struct API {
     static var tripBehavior = "\(connectedAppURL)/user/driverInsights/behaviors"
     static var latestTripBehavior = "\(connectedAppURL)/user/driverInsights/behaviors/latest"
     static var tripRoutes = "\(connectedAppURL)/user/triproutes"
+    static var tripAnalysisStatus = "\(connectedAppURL)/user/driverInsights/tripanalysisstatus"
     static var credentials = "\(connectedAppURL)/user/device/credentials"
-    
+
     static func setURIs(appURL: String) {
         carsNearby = "\(appURL)/user/carsnearby"
         reservation = "\(appURL)/user/reservation"
@@ -48,9 +53,17 @@ struct API {
         tripBehavior = "\(appURL)/user/driverInsights/behaviors"
         latestTripBehavior = "\(appURL)/user/driverInsights/behaviors/latest"
         tripRoutes = "\(appURL)/user/triproutes"
+        tripAnalysisStatus = "\(appURL)/user/driverInsights/tripanalysisstatus"
         credentials = "\(appURL)/user/device/credentials"
     }
-    
+
+    static func setDefaultServer () {
+        connectedAppURL = defaultAppURL
+        connectedAppGUID = defaultAppGUID
+        connectedCustomAuth = defaultCustomAuth
+        setURIs(connectedAppURL)
+    }
+
     static func delegateCustomAuthHandler() -> Void {
         let delegate = CustomAuthDelegate()
         let mcaAuthManager = MCAAuthorizationManager.sharedInstance
@@ -63,7 +76,7 @@ struct API {
         }
         return
     }
-    
+
     static func doInitialize() {
         let userDefaults = NSUserDefaults.standardUserDefaults()
         let appRoute = userDefaults.valueForKey("appRoute") as? String
@@ -80,6 +93,8 @@ struct API {
             BMSClient.sharedInstance.initializeWithBluemixAppRoute(connectedAppURL, bluemixAppGUID: connectedAppGUID, bluemixRegion: bmRegion)
             BMSClient.sharedInstance.authorizationManager = MCAAuthorizationManager.sharedInstance
             delegateCustomAuthHandler()
+            // uncomment the next line if make that login is always necessary after restart this application
+            // MCAAuthorizationManager.sharedInstance.logout(nil)
         } else {
             print("non-MCA server")
         }
@@ -152,71 +167,128 @@ struct API {
             return value
         }
     }
+
+    // convert NSMutableURLRequest to BMSCore Request
+    static private func toBMSRequest(request: NSMutableURLRequest) -> Request {
+        let bmsRequest = Request(url: request.URL!.absoluteString, headers: request.allHTTPHeaderFields, queryParameters: request.allHTTPHeaderFields, method: HttpMethod(rawValue: request.HTTPMethod)!)
+        print("toBMSRequest url: \(request.URL!.absoluteString)")
+        return bmsRequest
+    }
     
+    static private func toJsonArray(data: NSData) -> [NSMutableDictionary] {
+        var jsonArray: [NSMutableDictionary] = []
+        do {
+            if let tempArray:[NSMutableDictionary] = try NSJSONSerialization.JSONObjectWithData(data, options: [NSJSONReadingOptions.MutableContainers]) as? [NSMutableDictionary] {
+                jsonArray = tempArray
+            } else {
+                if let temp = try NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.MutableContainers) as? NSMutableDictionary {
+                    jsonArray.append(temp)
+                }
+            }
+        } catch {
+            print("data returned wasn't array of json")
+            /*
+             do {
+             if let temp = try NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions.MutableContainers) as? NSDictionary {
+             jsonArray[0] = temp
+             }
+             } catch {
+             print("data returned wasn't json")
+             }
+             */
+        }
+        return jsonArray
+    }
+
     static func doRequest(request: NSMutableURLRequest, callback: ((NSHTTPURLResponse, [NSDictionary]) -> Void)?) {
         print("\(request.HTTPMethod) to \(request.URL!)")
         request.setValue(getUUID(), forHTTPHeaderField: "iota-starter-uuid")
         print("using UUID: \(getUUID())")
         
-        let task = NSURLSession.sharedSession().dataTaskWithRequest(request) { data, response, error in
-            guard error == nil && data != nil else {
-                print("error=\(error!)")
-                handleError(error!)
-                return
-            }
-            
-            print("response = \(response!)")
-            
-            let responseString = NSString(data: data!, encoding: NSUTF8StringEncoding)
-            print("responseString = \(responseString!)")
-            
-            var jsonArray: [NSMutableDictionary] = []
-            do {
-                if let tempArray:[NSMutableDictionary] = try NSJSONSerialization.JSONObjectWithData(data!, options: [NSJSONReadingOptions.MutableContainers]) as? [NSMutableDictionary] {
-                    jsonArray = tempArray
-                } else {
-                    if let temp = try NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions.MutableContainers) as? NSMutableDictionary {
-                        jsonArray.append(temp)
+        if connectedCustomAuth == "true" {
+            print("doRequest(BMS)")
+            let bmsRequest = toBMSRequest(request)
+            // Convert callback for NSURLSession dataTaskWithRequest(request) to callback for BMSCore sendWithCompletionHandler() or sendData()
+            let bmsCallback: BmsCompletionHandler = {(response: Response?, error: NSError?) in
+                if error == nil {
+                    let nsResponse = NSHTTPURLResponse(URL: request.URL!, statusCode: response!.statusCode!, HTTPVersion: "HTTP/?.?", headerFields: response!.headers as! [String : String])!
+                    
+                    print("response = \(response!.statusCode!) \(response!.headers)")
+                    
+                    print("responseString = \(response!.responseText)")
+                    
+                    let jsonArray = toJsonArray(response!.responseData!)
+                    
+                    let statusCode = response!.statusCode
+                    print("statusCode was \(statusCode)")
+                    
+                    switch statusCode! {
+                    case 401:
+                        fallthrough
+                    case 500..<600:
+                        self.handleServerError(response!.responseData!, response: nsResponse)
+                        break
+                    case 200..<400:
+                        if !checkAPIVersion(nsResponse) {
+                            doHandleError("API Version Error", message: "API version between the server and mobile app is inconsistent. Please upgrade your server or mobile app.", moveToRoot: true)
+                            return;
+                        }
+                        fallthrough
+                    default:
+                        callback?(nsResponse, jsonArray)
                     }
+                } else {
+                    print ("error: \(error.debugDescription)")
                 }
-            } catch {
-                print("data returned wasn't array of json")
-                /*
-                 do {
-                 if let temp = try NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions.MutableContainers) as? NSDictionary {
-                 jsonArray[0] = temp
-                 }
-                 } catch {
-                 print("data returned wasn't json")
-                 }
-                 */
             }
+            if request.HTTPBody == nil {
+                print("doRequest(BMS) no HTTPBody")
+                bmsRequest.sendWithCompletionHandler(bmsCallback)
+            } else {
+                print("doRequest(BMS) HTTPBody \(NSString(data: request.HTTPBody!, encoding: NSUTF8StringEncoding) as? String)")
+                bmsRequest.sendData(request.HTTPBody!, completionHandler: bmsCallback)
+            }
+        } else {
+            let task = NSURLSession.sharedSession().dataTaskWithRequest(request) { data, response, error in
+                guard error == nil && data != nil else {
+                    print("error=\(error!)")
+                    handleError(error!)
+                    return
+                }
             
+                print("response = \(response!)")
             
-            let httpStatus = response as? NSHTTPURLResponse
-            print("statusCode was \(httpStatus!.statusCode)")
+                let responseString = NSString(data: data!, encoding: NSUTF8StringEncoding)
+                print("responseString = \(responseString!)")
             
-            let statusCode = httpStatus?.statusCode
+                let jsonArray = toJsonArray(data!)
             
-            switch statusCode! {
-            case 401:
+                let httpStatus = response as? NSHTTPURLResponse
+                print("statusCode was \(httpStatus!.statusCode)")
+            
+                let statusCode = httpStatus?.statusCode
+            
+                switch statusCode! {
+                case 401:
                 self.login(request, callback: callback)
                 break
-            case 500..<600:
+                case 500..<600:
                 self.handleServerError(data!, response: (response as? NSHTTPURLResponse)!)
-                break
-            case 200..<400:
-                if !checkAPIVersion(response as! NSHTTPURLResponse) {
-                    doHandleError("API Version Error", message: "API version between the server and mobile app is inconsistent. Please upgrade your server or mobile app.", moveToRoot: true)
-                    return;
+                    break
+                case 200..<400:
+                    if !checkAPIVersion(response as! NSHTTPURLResponse)     {
+                        doHandleError("API Version Error", message: "API version between the server and mobile app is inconsistent. Please upgrade your server or mobile app.", moveToRoot: true)
+                        return;
+                    }
+                    fallthrough
+                default:
+                    callback?((response as? NSHTTPURLResponse)!, jsonArray)
                 }
-                fallthrough
-            default:
-                callback?((response as? NSHTTPURLResponse)!, jsonArray)
-            }
+             }
+            task.resume()
         }
-        task.resume()
     }
+
     static func checkAPIVersion(response:NSHTTPURLResponse)->Bool{
         guard let apiVersion:String = response.allHeaderFields["iota-starter-car-sharing-version"] as? String else{
             print("Server API 1.0 is not supported")

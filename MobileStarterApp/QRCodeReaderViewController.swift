@@ -78,6 +78,17 @@ class QRCodeReaderViewController: UIViewController, AVCaptureMetadataOutputObjec
                 }
             }
 
+            // Add the text field for enabling MCA
+            var customAuthTextField: UITextField?
+            
+            alert.addTextFieldWithConfigurationHandler { textField in
+                customAuthTextField = textField
+                customAuthTextField?.placeholder = NSLocalizedString("Custom auth. 'true'(optional)", comment: "")
+                if let customAuth: String = NSUserDefaults.standardUserDefaults().valueForKey("customAuth") as? String {
+                    customAuthTextField?.text = customAuth
+                }
+            }
+
 
             // Create the actions.
             let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel) { action in
@@ -87,13 +98,19 @@ class QRCodeReaderViewController: UIViewController, AVCaptureMetadataOutputObjec
             let okAction = UIAlertAction(title: "OK", style: .Default) { action in
                 let appRoute = routeTextField?.text
                 let appGUID = guidTextField?.text
+                var customAuth = ""
+                if customAuthTextField?.text == "true" {
+                    customAuth = "true"
+                }
                 let userDefaults = NSUserDefaults.standardUserDefaults()
                 if appRoute != "" {
                     userDefaults.setValue(appRoute, forKey: "appRoute")
                     userDefaults.setValue(appGUID, forKey: "appGUID")
-                    // if use customAuth then uncomment setValue and comment out removeObjetForKey
-                    //userDefaults.setValue("true", forKey: "customAuth")
-                    userDefaults.removeObjectForKey("customAuth")
+                    if customAuth == "true" {
+                        userDefaults.setValue("true", forKey: "customAuth")
+                    } else {
+                        userDefaults.removeObjectForKey("customAuth")
+                    }
                 }
                 userDefaults.synchronize()
                 self.navigationController?.popViewControllerAnimated(true)

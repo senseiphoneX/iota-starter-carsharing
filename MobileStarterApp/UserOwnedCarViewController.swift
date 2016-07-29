@@ -25,7 +25,7 @@ class UserOwnedCarViewController: UIViewController, CLLocationManagerDelegate {
     @IBOutlet weak var drivingButton: UIButton!
 
     let locationManager = CLLocationManager()
-    var location: CLLocationCoordinate2D?
+    var tripCount: Int = 0
     
     var startedDriving: Bool = false
     var deviceID: String! = ViewController.mobileAppDeviceId
@@ -66,9 +66,11 @@ class UserOwnedCarViewController: UIViewController, CLLocationManagerDelegate {
         self.tabBarController?.tabBar.hidden = false
         
         self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        self.locationManager.activityType = .AutomotiveNavigation
         self.locationManager.requestWhenInUseAuthorization()
         self.locationManager.startUpdatingLocation()
         
+        self.mapView.delegate = self
         self.mapView.showsUserLocation = true
         self.mapView.userTrackingMode = .Follow
     }
@@ -94,8 +96,9 @@ class UserOwnedCarViewController: UIViewController, CLLocationManagerDelegate {
     }
     
     func locationManager(manager: CLLocationManager, didUpdateToLocation newLocation: CLLocation, fromLocation oldLocation: CLLocation) {
-        mapView.setRegion(MKCoordinateRegion(center: CLLocationCoordinate2DMake(newLocation.coordinate.latitude, newLocation.coordinate.longitude), span: MKCoordinateSpanMake(0.05, 0.05)), animated: true)
-        
+        if(!mapView.userLocationVisible){
+            mapView.userTrackingMode = .Follow   
+        }
         if (self.startedDriving) {
             if(!ViewController.behaviorDemo){
                 // get credentials may be failed
@@ -105,6 +108,41 @@ class UserOwnedCarViewController: UIViewController, CLLocationManagerDelegate {
                 return
             }
             self.titleLabel.text = "Speed: \(max(0, newLocation.speed * 60 * 60 / 1000)) km/h"
+            let center = CLLocationCoordinate2DMake(newLocation.coordinate.latitude, newLocation.coordinate.longitude)
+            let circle = MKCircle(centerCoordinate: center, radius: 10);
+            circle.title = "location"
+            mapView.addOverlay(circle)
+            
+            self.tripCount += 1
+            if(self.tripCount % 10 == 0) {
+                renderMapMatchedLocation()
+            }
+        }
+    }
+    
+    func renderMapMatchedLocation() {
+        let trip_id = ViewController.getTripId(self.deviceID)
+        if (trip_id == nil){
+            return
+        }
+        let url: NSURL = NSURL(string: "\(API.tripRoutes)/" + (trip_id)! + "?count=20&matchedOnly=true")!
+        let request: NSMutableURLRequest = NSMutableURLRequest(URL: url)
+        request.HTTPMethod = "GET"
+        
+        var stats:[Path] = []
+        API.doRequest(request) { (response, jsonArray) -> Void in
+            stats = Path.fromDictionary(jsonArray)
+            if stats.count > 0 {
+                if let stat: Path = stats[0] {
+                    dispatch_async(dispatch_get_main_queue(), {
+                        for coordinate in stat.coordinates! {
+                            let circle = MKCircle(centerCoordinate: CLLocationCoordinate2DMake(coordinate[1].doubleValue!, coordinate[0].doubleValue!), radius: 10);
+                            circle.title = "mapMacthed"
+                            self.mapView.addOverlay(circle)
+                        }
+                    })
+                }
+            }
         }
     }
     
@@ -128,6 +166,7 @@ class UserOwnedCarViewController: UIViewController, CLLocationManagerDelegate {
     
     @IBAction func startedDriving(sender: AnyObject) {
         if (!startedDriving) {
+            self.mapView.removeOverlays(self.mapView.overlays)
             if(ViewController.startDrive(self.deviceID!)){
                 self.reserveCar()
                 drivingButton.setBackgroundImage(UIImage(named: "endDriving"), forState: UIControlState.Normal)
@@ -268,5 +307,22 @@ class UserOwnedCarViewController: UIViewController, CLLocationManagerDelegate {
         default:
             self.titleLabel.text = "Something Went Wrong."
         }
+    }
+}
+
+extension UserOwnedCarViewController: MKMapViewDelegate {
+    func mapView(mapView: MKMapView, rendererForOverlay overlay: MKOverlay) -> MKOverlayRenderer {
+        let renderer:MKOverlayPathRenderer
+        if overlay is MKCircle {
+            renderer = MKCircleRenderer(overlay:overlay)
+        } else {
+            renderer = MKPolylineRenderer(overlay:overlay)
+        }
+        if (overlay.title! == "location") {
+            renderer.fillColor = UIColor(red: 0.7, green: 0.0, blue: 0.0, alpha: 0.5)
+        } else {
+            renderer.fillColor = UIColor(red: 0.0, green: 0.7, blue: 0.0, alpha: 1.0)
+        }
+        return renderer
     }
 }

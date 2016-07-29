@@ -16,7 +16,7 @@
 
 import UIKit
 
-class ProfileViewController: UIViewController {
+class ProfileViewController: UIViewController, MessageViewController {
 
     @IBOutlet weak var fetchingLabel: UILabel!
     @IBOutlet weak var tableView: UITableView!
@@ -53,7 +53,11 @@ class ProfileViewController: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
+
+    func setMessage(text: String) {
+        self.fetchingLabel.text = text
+    }
+
     func getDriverStats() {
         let url: NSURL = NSURL(string: "\(API.driverStats)")!
         let request: NSMutableURLRequest = NSMutableURLRequest(URL: url)

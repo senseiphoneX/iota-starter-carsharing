@@ -85,6 +85,18 @@ class TripViewController: UIViewController {
                 multiplier:1,
                 constant:40
             ))
+            let trip_id = tripData!.trip_id
+            let url: NSURL = NSURL(string: "\(API.tripAnalysisStatus)/\(trip_id!)")!
+            let request: NSMutableURLRequest = NSMutableURLRequest(URL: url)
+            request.HTTPMethod = "GET"
+            API.doRequest(request){ (response, jsonArray) -> Void in
+                if jsonArray.count > 0 {
+                    let status = jsonArray[0]
+                    dispatch_async(dispatch_get_main_queue(), {
+                        self.notAnalyzedLabel.text = status["message"] as? String
+                    })
+                }
+            }
             return
         }
         notAnalyzedLabel.addConstraint(NSLayoutConstraint(

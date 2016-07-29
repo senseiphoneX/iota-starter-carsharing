@@ -17,7 +17,7 @@
 import UIKit
 import CoreLocation
 
-class TripsTableViewController: UIViewController {
+class TripsTableViewController: UIViewController, MessageViewController {
     
     var trips = [TripData]()
     
@@ -45,6 +45,10 @@ class TripsTableViewController: UIViewController {
         
         self.titleLabel.text = "Fetching trips..."
         getTrips()
+    }
+
+    func setMessage(text: String) {
+        self.titleLabel.text = text
     }
 
     func getTrips() {
