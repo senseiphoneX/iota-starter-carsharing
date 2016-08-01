@@ -222,7 +222,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         API.doInitialize()
         ViewController.behaviorDemo = true
         ViewController.needCredentials = true
-        locationManager.allowsBackgroundLocationUpdates = true
+        if #available(iOS 9.0, *) {
+            locationManager.allowsBackgroundLocationUpdates = true
+        }
         locationManager.requestAlwaysAuthorization()
         locationManager.startUpdatingLocation()
     }

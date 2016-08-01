@@ -62,10 +62,10 @@ You can enable push notifications to the mobile app when the weather at the drop
 11. Read the QR code by the mobile app
 
 ---
-This mobile app contains simple demonstration of Mobile Client Access service. It logins with hardcoded username and password using Mobile Client Access for custom authentication.
+This mobile app contains simple demonstration of Mobile Client Access service. It logins with username and password using Mobile Client Access for custom authentication.
 
 * [CustomAuthDelegate.swift](MobileStarterApp/CustomAuthDelegate.swift) onAuthenticationChallengeReceived()  
-Call submitAuthenticationChallengeAnswer() with hardcorded username and password.
+Call submitAuthenticationChallengeAnswer() with username and password entered in Login alert.
 
 * [QRCodeReaderViewController.swift](MobileStarterApp/QRCodeReaderViewController.swift) configureVideoCapture()  
 Set whether use custom authentication or not in okAction.
