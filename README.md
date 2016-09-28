@@ -87,7 +87,7 @@ For more information, see [Configuring the Mobile Client Access client SDK for i
 You also need to add and configure Mobile Client Access for custom authentication on the IoT for Automotive Starter Experience Carsharing app server. For more information, see [IoT for Automotive Starter app]( https://github.com/ibm-watson-iot/iota-starter-server).
 
 ## Reporting defects
-To report a bug in the Carsharing app, go to the  [Issues](https://github.com/ibm-watson-iot/iota-starter-carsharing/issues) section.
+To report a defect in the Carsharing app, go to the  [Issues](https://github.com/ibm-watson-iot/iota-starter-carsharing/issues) section.
 
 ## Privacy notice
 The IoT for Automotive Starter Experience Carsharing app on IBM Bluemix stores all of the driving history that is obtained while you use the mobile app.
