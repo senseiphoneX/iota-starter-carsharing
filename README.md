@@ -29,7 +29,7 @@ To deploy the IBM IoT for Automotive - Mobility Starter Application mobile app, 
 ```$ pod install```  
 ```$ open MobileStarterApp.xcworkspace```
 
-4. Set a URL of an instance of **IBM IoT for Automotive - Mobility Starter Application server app** to the _connectedAppURL_ variable in **API.swift** file.
+4. Edit the **API.swift file**, and set the `connectedAppURL variableinsert` property to the URL for your IoT for Automotive - Mobility Starter Application server app.
 
 5.  At the upper left of the Xcode UI, click **Run**.
 
@@ -45,13 +45,13 @@ You can optionally enable Apple Push Notifications (APN) to warn users about sev
 
 To enable push notifications, complete the following steps:
 
-1. Register an app ID enabled APNs on the [Apple Developer](https://developer.apple.com/) portal.
+1.  Register your App ID for APNs on the [Apple Developer portal](https://developer.apple.com/).
 
 2. Create an APN development SSL certificate.
 
 3. Create an APN development provisioning profile.
 
-4. Setting up APNs on the Bluemix Push Notifications Dashboard binded to your server application.
+4. Go to the Bluemix Push Notifications Dashboard and bind the APNs that you created to your server app.
 
 5. Connect your iOS mobile device to your Apple Mac.
 
@@ -77,7 +77,7 @@ The IoT for Automotive - Mobility Starter Application car sharing mobile app pro
 Call `submitAuthenticationChallengeAnswer()` with the user name and password that you entered in the login alert.
 
 * [QRCodeReaderViewController.swift](MobileStarterApp/QRCodeReaderViewController.swift) configureVideoCapture()  
-Set whether to use custom authentication in okAction.
+Set whether to use custom authentication for the `okAction` function.
 
 * [API.swift](MobileStarterApp/API.swift) doInitialize()  
 Initialize the Mobile Client Access client SDK.
