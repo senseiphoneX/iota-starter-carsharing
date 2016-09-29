@@ -1,35 +1,35 @@
-# IoT for Automotive Starter Carsharing mobile app
+# IBM IoT for Automotive - Mobility Starter Application mobile app
 
 
 ## Overview
-The IoT for Automotive Starter Experience uses the **Context Mapping** and **Driver Behavior** services that are available on **IBM Bluemix** to help you to quickly build a smart car-sharing automotive solution. The IoT for Automotive Starter Experience Carsharing application consists of a set of source code and instructions for an iOS mobile app and a server app.
+The IBM IoT for Automotive - Mobility Starter Application uses the **Context Mapping** and **Driver Behavior** services that are available on **IBM Bluemix** to help you to quickly build a smart car-sharing automotive solution. The IoT for Automotive Starter Experience Carsharing application consists of a mobile app and a server app.
 
-The Carsharing mobile app provides sample source code for interacting with the Carsharing server app. The server app provides the back-end car-sharing service. For more information about deploying the server app of the Carsharing starter experience, see
+The IBM IoT for Automotive - Mobility Starter Application mobile app interacts with the server app. The server app provides the back-end car-sharing service. For more information about deploying the car-sharing server app of the Mobility Starter Application, see
 [ibm-watson-iot/iota-starter-server](https://github.com/ibm-watson-iot/iota-starter-server).
 
-Using the iOS Carsharing mobile app, you can search for available cars that are nearby, reserve a car, unlock the car, and then start driving the car. While you drive the car, the service tracks your location and also records your driving behavior. When you reach your driving destination, you can view information about each trip that you took in the car and you can also view your driving behavior score.
+Using the car-sharing mobile app, you can search for available cars that are nearby, reserve a car, unlock the car, and then start driving the car. While you drive the car, the service tracks your location and also records your driving behavior. When you reach your driving destination, you can view information about each trip that you took in the car and you can also view your driving behavior score.
 
 ## Prerequisites
 
-Before you try to deploy the mobile app, ensure that the following prerequisites are met:
+Before you deploy the IBM IoT for Automotive - Mobility Starter Application mobile app, ensure that the following prerequisites are met:
 
-- The sample source code for the IoT for Automotive Starter Experience Carsharing mobile app is only supported for use with an official Apple iOS device.
-- The sample source code is also supported only with officially licensed Apple development tools that are customized and distributed under the terms and conditions of your licensed Apple iOS Developer Program or your licensed Apple iOS Enterprise Program.
-- Apple Xcode 7.3 integrated development environment (IDE) and [CocoaPods](https://cocoapods.org/) must be installed onto the computer that you plan to clone the source repository onto.
+- The sample source code for the mobile app is only supported for use with an official Apple iOS device.
+- The sample source code for the mobile app is also supported only with officially licensed Apple development tools that are customized and distributed under the terms and conditions of your licensed Apple iOS Developer Program or your licensed Apple iOS Enterprise Program.
+- Apple Xcode 7.3 integrated development environment (IDE) and [CocoaPods](https://cocoapods.org/) must be installed on the computer that you plan to clone the mobile app source repository onto.
 
-## Building the starter mobile app
+## Deploying the mobile app
 
-To deploy the starter experience Carsharing mobile app, do the following steps:
+To deploy the IBM IoT for Automotive - Mobility Starter Application mobile app, do the following steps:
 
 1. Open a Terminal session and install CocoaPods by using the following command:   
 ```$ sudo gem install cocoapods```    
 2. Clone the IBM Carsharing source code repository for the sample mobile app by using the following git command:  
 ```$ git clone https://github.com/ibm-watson-iot/iota-starter-carsharing```   
-3. Go to your Carsharing project folder, and then enter the following commands:   
+3. Go to your Mobility Starter Application project folder, and then enter the following commands:   
 ```$ pod install```  
 ```$ open MobileStarterApp.xcworkspace```
 
-4. Set a URL of an instance of **IoT for Automotive Starter Server App** to the _connectedAppURL_ variable in **API.swift** file.
+4. Set a URL of an instance of **IBM IoT for Automotive - Mobility Starter Application server app** to the _connectedAppURL_ variable in **API.swift** file.
 
 5.  At the upper left of the Xcode UI, click **Run**.
 
@@ -71,7 +71,7 @@ For more information, see [Push notifications](https://console.ng.bluemix.net/do
 
 ### Mobile Client Access service
 
-The Carsharing mobile app provides a simple demonstration of the Mobile Client Access service. The app logs in with the user name and password by using the  Mobile Client Access for custom authentication.
+The IoT for Automotive - Mobility Starter Application car sharing mobile app provides a simple demonstration of the Mobile Client Access service. The app logs in with the user name and password by using the  Mobile Client Access for custom authentication.
 
 * [CustomAuthDelegate.swift](MobileStarterApp/CustomAuthDelegate.swift) onAuthenticationChallengeReceived()  
 Call `submitAuthenticationChallengeAnswer()` with the user name and password that you entered in the login alert.
@@ -84,14 +84,13 @@ Initialize the Mobile Client Access client SDK.
 
 For more information, see [Configuring the Mobile Client Access client SDK for iOS](https://console.ng.bluemix.net/docs/services/mobileaccess/custom-auth-ios-swift-sdk.html).
 
-You also need to add and configure Mobile Client Access for custom authentication on the IoT for Automotive Starter Experience Carsharing app server. For more information, see [IoT for Automotive Starter app]( https://github.com/ibm-watson-iot/iota-starter-server).
+You also need to add and configure Mobile Client Access for custom authentication on the IoT for Automotive - Mobility Starter Application app server. For more information, see [IoT for Automotive - Mobility Starter Application server]( https://github.com/ibm-watson-iot/iota-starter-server).
 
 ## Reporting defects
-To report a defect in the Carsharing app, go to the  [Issues](https://github.com/ibm-watson-iot/iota-starter-carsharing/issues) section.
+To report a defect with the IoT for Automotive - Mobility Starter Application mobile app, go to the [Issues](https://github.com/ibm-watson-iot/iota-starter-carsharing/issues) section.
 
 ## Privacy notice
-The IoT for Automotive Starter Experience Carsharing app on IBM Bluemix stores all of the driving history that is obtained while you use the mobile app.
-
+The IoT for Automotive - Mobility Starter Applicationapp on Bluemix stores all of the driving data that is obtained while you use the mobile app.
 
 ## Useful links
 
