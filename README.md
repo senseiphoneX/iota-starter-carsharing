@@ -1,17 +1,15 @@
-# IBM IoT for Automotive - Mobility Starter Application mobile app
-
+# IBM IoT for Automotive - Mobility Starter Application mobile app for iOS
 
 ## Overview
-The IBM IoT for Automotive - Mobility Starter Application uses the **Context Mapping** and **Driver Behavior** services that are available on **IBM Bluemix** to help you to quickly build a smart car-sharing automotive solution. The IBM IoT for Automotive - Mobility Starter Application consists of a mobile app and a server app.  
-
-The IBM IoT for Automotive - Mobility Starter Application mobile app interacts with the server app. The server app provides the back-end car-sharing service. By default, the mobile app connects to a test server that is provided by IBM. You can also choose to deploy your own server and connect your mobile app to your instance instead of the IBM test server. For more information about deploying the car-sharing server app of the Mobility Starter Application, see
-[ibm-watson-iot/iota-starter-server](https://github.com/ibm-watson-iot/iota-starter-server).
+The IBM IoT for Automotive - Mobility Starter Application uses the **Context Mapping** and **Driver Behavior** services that are available on **IBM Bluemix** to help you to quickly build a smart car-sharing automotive solution. The IBM IoT for Automotive - Mobility Starter Application consists of a mobile app and a server component.
 
 Using the car-sharing mobile app, you can search for available cars that are nearby, reserve a car, unlock the car, and then start driving the car. While you drive the car, the service tracks your location and also records your driving behavior. When you reach your driving destination, you can view information about each trip that you took in the car and you can also view your driving behavior score.
 
+The IoT for Automotive - Mobility Starter Application mobile app interacts with the server component. The server component provides the car-sharing system monitoring service. By default, the mobile app connects to a test server that is provided by IBM. You can also choose to deploy your own server and connect your mobile app to your server instance instead. For more information about deploying the car-sharing server component, see [ibm-watson-iot/iota-starter-server](https://github.com/ibm-watson-iot/iota-starter-server).
+
 ## Prerequisites
 
-Before you deploy the IBM IoT for Automotive - Mobility Starter Application mobile app, ensure that the following prerequisites are met:
+Before you deploy the IoT for Automotive - Mobility Starter Application iOS mobile app, ensure that the following prerequisites are met:
 
 - The sample source code for the mobile app is only supported for use with an official Apple iOS device.
 - The sample source code for the mobile app is also supported only with officially licensed Apple development tools that are customized and distributed under the terms and conditions of your licensed Apple iOS Developer Program or your licensed Apple iOS Enterprise Program.
@@ -19,7 +17,9 @@ Before you deploy the IBM IoT for Automotive - Mobility Starter Application mobi
 
 ## Deploying the mobile app
 
-To deploy the IBM IoT for Automotive - Mobility Starter Application mobile app, do the following steps:
+The mobile app is available for iOS and Android mobile devices. For more information about deploying the Android version of the mobile app, see [IBM IoT for Automotive - Mobility Starter Application mobile app for Android](https://github.com/ibm-watson-iot/iota-starter-carsharing-android).
+
+To deploy the IoT for Automotive - Mobility Starter Application iOS mobile app, do the following steps:
 
 1. Open a Terminal session and install CocoaPods by using the following command:   
 ```$ sudo gem install cocoapods```    
