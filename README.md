@@ -6,11 +6,11 @@ The IBM IoT for Automotive - Mobility Starter Application uses the **Context Map
 
 Using the car-sharing mobile app, you can search for available cars that are nearby, reserve a car, unlock the car, and then start driving the car. While you drive the car, the service tracks your location and also records your driving behavior. When you reach your driving destination, you can view information about each trip that you took in the car and you can also view your driving behavior score.
 
-The IoT for Automotive - Mobility Starter Application mobile app interacts with the server component. The server component provides the car-sharing system monitoring service. By default, the mobile app connects to a test server that is provided by IBM. You can also choose to deploy your own server and connect your mobile app to your server instance instead. For more information about deploying the car-sharing server component, see [ibm-watson-iot/iota-starter-server](https://github.com/ibm-watson-iot/iota-starter-server).
+The IoT for Automotive - Mobility Starter Application mobile app interacts with the server component. The server component provides the back-end car sharing and system monitoring service. By default, the mobile app connects to a test server that is provided by IBM. You can also choose to deploy your own server and connect your mobile app to your own server instance instead. For more information about deploying the car-sharing server component, see [ibm-watson-iot/iota-starter-server](https://github.com/ibm-watson-iot/iota-starter-server).
 
 ## Prerequisites
 
-Before you deploy the IoT for Automotive - Mobility Starter Application iOS mobile app, ensure that the following prerequisites are met:
+Before you deploy the IoT for Automotive - Mobility Starter Application mobile app for iOS, ensure that the following prerequisites are met:
 
 - The sample source code for the mobile app is only supported for use with an official Apple iOS device.
 - The sample source code for the mobile app is also supported only with officially licensed Apple development tools that are customized and distributed under the terms and conditions of your licensed Apple iOS Developer Program or your licensed Apple iOS Enterprise Program.
@@ -18,9 +18,9 @@ Before you deploy the IoT for Automotive - Mobility Starter Application iOS mobi
 
 ## Deploying the mobile app
 
-The mobile app is available for iOS and Android mobile devices. For more information about deploying the Android version of the mobile app, see [IBM IoT for Automotive - Mobility Starter Application mobile app for Android](https://github.com/ibm-watson-iot/iota-starter-carsharing-android).
+You can download and install the mobile app on iOS and Android mobile devices. For more information about deploying the Android version of the mobile app, see [IBM IoT for Automotive - Mobility Starter Application mobile app for Android](https://github.com/ibm-watson-iot/iota-starter-carsharing-android).
 
-To deploy the IoT for Automotive - Mobility Starter Application iOS mobile app, do the following steps:
+To deploy the IoT for Automotive - Mobility Starter Application mobile app for iOS, complete the following steps:
 
 1. Open a Terminal session and install CocoaPods by using the following command:   
 ```$ sudo gem install cocoapods```    
@@ -32,7 +32,7 @@ To deploy the IoT for Automotive - Mobility Starter Application iOS mobile app, 
 
 4. Edit the **API.swift file**, and set the `connectedAppURL variableinsert` property to the URL for your IoT for Automotive - Mobility Starter Application server app.
 
-5.  At the upper left of the Xcode UI, click **Run**.
+5. Go to the upper left of the Xcode UI, click **Run**.
 
 6. Optional: If you would like to be notified about certain events, for example, severe weather at the pickup location, enable push notifications, as outlined in the next procedure.
 
@@ -46,7 +46,7 @@ You can optionally enable Apple Push Notifications (APN) to warn users about sev
 
 To enable push notifications, complete the following steps:
 
-1.  Register your App ID for APNs on the [Apple Developer portal](https://developer.apple.com/).
+1. Register your app ID for APNs on the [Apple Developer portal](https://developer.apple.com/).
 
 2. Create an APN development SSL certificate.
 
@@ -64,9 +64,11 @@ To enable push notifications, complete the following steps:
 
 9. To start the camera function, tap the QR code image.
 
-10. From a browser, connect to the server application at the URL https://&lt;your-app-route&gt;.mybluemix.net/, and then scroll down to display the QR code.
-
-11. Read the QR code from the mobile app.
+10. From a browser, connect to the server application and display the QR code:
+  - If you are connecting your mobile app to the predeployed IBM test Mobility Starter Application server,  can find the QR code on the Starter Experience home page.
+  - If you are connecting your mobile app to your own server instance, you can find the QR code for your server instance at the bottom of the following page: `https://&lt;your-app-route&gt;.mybluemix.net/`
+  
+11. Scan the QR code from your mobile app.
 
 For more information, see [Push notifications](https://console.ng.bluemix.net/docs/services/mobilepush/t_push_provider_ios.html).
 
@@ -85,7 +87,7 @@ Initialize the Mobile Client Access client SDK.
 
 For more information, see [Configuring the Mobile Client Access client SDK for iOS](https://console.ng.bluemix.net/docs/services/mobileaccess/custom-auth-ios-swift-sdk.html).
 
-You also need to add and configure Mobile Client Access for custom authentication on the IoT for Automotive - Mobility Starter Application app server. For more information, see [IoT for Automotive - Mobility Starter Application server]( https://github.com/ibm-watson-iot/iota-starter-server).
+You also need to add and configure Mobile Client Access for custom authentication on the IoT for Automotive - Mobility Starter Application server. For more information, see [IoT for Automotive - Mobility Starter Application server]( https://github.com/ibm-watson-iot/iota-starter-server).
 
 ## Reporting defects
 To report a defect with the IoT for Automotive - Mobility Starter Application mobile app, go to the [Issues](https://github.com/ibm-watson-iot/iota-starter-carsharing/issues) section.
