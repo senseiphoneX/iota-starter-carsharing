@@ -1,24 +1,17 @@
 /**
  * Copyright 2016 IBM Corp. All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the IBM License, a copy of which may be obtained at:
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www14.software.ibm.com/cgi-bin/weblap/lap.pl?li_formnum=L-DDIN-ADRVKF&popup=y&title=IBM%20IoT%20for%20Automotive%20Sample%20Starter%20Apps
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You may not use this file except in compliance with the license.
  */
-
 import UIKit
 import CoreLocation
 import CocoaMQTT
 
-class ViewController: UIViewController, CLLocationManagerDelegate {
+class ViewController: UIViewController, CLLocationManagerDelegate, UIViewControllerTransitioningDelegate {
     @IBOutlet weak var smarterMobilityLabel : UILabel!
     @IBOutlet weak var specifyServerButton: UIButton!
     @IBOutlet weak var navigator: UINavigationItem!
@@ -164,9 +157,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        confirmDisclaimer();
+        
         // Set title border
         let smarterMobilityText = NSAttributedString(
-            string: "Smarter Mobility",
+            string: "IBM IoT for Automotive",
             attributes: [NSStrokeColorAttributeName: Colors.dark,
                         NSStrokeWidthAttributeName: -1.0])
         smarterMobilityLabel.attributedText = smarterMobilityText
@@ -240,6 +235,47 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             let app = UIApplication.sharedApplication()
             app.cancelAllLocalNotifications()
         }
+    }
+
+
+    func confirmDisclaimer() {
+        let licenseVC: UIViewController = self.storyboard!.instantiateViewControllerWithIdentifier("licenseViewController")
+        licenseVC.modalPresentationStyle = .Custom
+        licenseVC.transitioningDelegate = self
+        self.presentViewController(licenseVC, animated: true, completion: nil)
+    }
+    func presentationControllerForPresentedViewController(presented: UIViewController, presentingViewController presenting: UIViewController?, sourceViewController source: UIViewController) -> UIPresentationController? {
+        return LicensePresentationController(presentedViewController: presented, presentingViewController: presenting)
+    }
+}
+class LicensePresentationController: UIPresentationController{
+    private static let LICENSE_VIEW_MARGIN:CGFloat = 20
+    var overlay: UIView!
+    override func presentationTransitionWillBegin() {
+        let containerView = self.containerView!
+        self.overlay = UIVisualEffectView(effect: UIBlurEffect(style: .Light))
+        self.overlay.frame = containerView.bounds
+        containerView.insertSubview(self.overlay, atIndex: 0)
+    }
+    override func dismissalTransitionDidEnd(completed: Bool) {
+        if completed {
+            self.overlay.removeFromSuperview()
+        }
+    }
+    override func sizeForChildContentContainer(container: UIContentContainer, withParentContainerSize parentSize: CGSize) -> CGSize {
+        return CGSize(width: parentSize.width - LicensePresentationController.LICENSE_VIEW_MARGIN*2, height: parentSize.height - LicensePresentationController.LICENSE_VIEW_MARGIN*2)
+    }
+    override func frameOfPresentedViewInContainerView() -> CGRect {
+        var presentedViewFrame = CGRectZero
+        let containerBounds = self.containerView!.bounds
+        presentedViewFrame.size = self.sizeForChildContentContainer(self.presentedViewController, withParentContainerSize: containerBounds.size)
+        presentedViewFrame.origin.x = LicensePresentationController.LICENSE_VIEW_MARGIN
+        presentedViewFrame.origin.y = LicensePresentationController.LICENSE_VIEW_MARGIN
+        return presentedViewFrame
+    }
+    override func containerViewWillLayoutSubviews() {
+        self.overlay.frame = self.containerView!.bounds
+        self.presentedView()!.frame = self.frameOfPresentedViewInContainerView()
     }
 }
 

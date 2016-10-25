@@ -1,26 +1,19 @@
 /**
  * Copyright 2016 IBM Corp. All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the IBM License, a copy of which may be obtained at:
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www14.software.ibm.com/cgi-bin/weblap/lap.pl?li_formnum=L-DDIN-ADRVKF&popup=y&title=IBM%20IoT%20for%20Automotive%20Sample%20Starter%20Apps
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You may not use this file except in compliance with the license.
  */
-
 import CoreLocation
 import UIKit
 import BMSCore
 import BMSSecurity
 
 struct API {
-
+    static var moveToRootOnError = true
     static let defaultAppURL = "https://iota-starter-server.mybluemix.net"
     static let defaultAppGUID = ""
     static var defaultCustomAuth = "" // non-MCA server
@@ -61,6 +54,7 @@ struct API {
         connectedAppURL = defaultAppURL
         connectedAppGUID = defaultAppGUID
         connectedCustomAuth = defaultCustomAuth
+        moveToRootOnError = true
         setURIs(connectedAppURL)
     }
 
@@ -82,6 +76,7 @@ struct API {
         let appRoute = userDefaults.valueForKey("appRoute") as? String
         let appGUID = userDefaults.valueForKey("appGUID") as? String
         let customAuth = userDefaults.valueForKey("customAuth") as? String
+        moveToRootOnError = true
         if(appRoute != nil){
             connectedAppURL = appRoute!
             connectedAppGUID = appGUID == nil ? "" : appGUID!
@@ -119,7 +114,7 @@ struct API {
     }
    
     static func handleError(error: NSError) {
-        doHandleError("Communication Error", message: "\(error)", moveToRoot: true)
+        doHandleError("Communication Error", message: "\(error)", moveToRoot: moveToRootOnError)
     }
     
     static func handleServerError(data:NSData, response: NSHTTPURLResponse) {
@@ -170,7 +165,7 @@ struct API {
 
     // convert NSMutableURLRequest to BMSCore Request
     static private func toBMSRequest(request: NSMutableURLRequest) -> Request {
-        let bmsRequest = Request(url: request.URL!.absoluteString, headers: request.allHTTPHeaderFields, queryParameters: request.allHTTPHeaderFields, method: HttpMethod(rawValue: request.HTTPMethod)!)
+        let bmsRequest = Request(url: request.URL!.absoluteString!, headers: request.allHTTPHeaderFields, queryParameters: request.allHTTPHeaderFields, method: HttpMethod(rawValue: request.HTTPMethod)!)
         print("toBMSRequest url: \(request.URL!.absoluteString)")
         return bmsRequest
     }
@@ -236,6 +231,7 @@ struct API {
                         fallthrough
                     default:
                         callback?(nsResponse, jsonArray)
+                        moveToRootOnError = false
                     }
                 } else {
                     print ("error: \(error.debugDescription)")
@@ -283,6 +279,7 @@ struct API {
                     fallthrough
                 default:
                     callback?((response as? NSHTTPURLResponse)!, jsonArray)
+                    moveToRootOnError = false
                 }
              }
             task.resume()

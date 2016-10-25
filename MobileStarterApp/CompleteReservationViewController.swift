@@ -1,19 +1,12 @@
 /**
  * Copyright 2016 IBM Corp. All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the IBM License, a copy of which may be obtained at:
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www14.software.ibm.com/cgi-bin/weblap/lap.pl?li_formnum=L-DDIN-ADRVKF&popup=y&title=IBM%20IoT%20for%20Automotive%20Sample%20Starter%20Apps
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You may not use this file except in compliance with the license.
  */
-
 import UIKit
 import CoreLocation
 
@@ -106,6 +99,16 @@ class CompleteReservationViewController: UIViewController {
     }
 
     @IBAction func cancelReservationAction(sender: AnyObject) {
+        // Need at least 10 sec to anlyze trip
+        if(reservation!.status == "driving" && reservation!.actualPickupTime != nil &&
+            NSDate().timeIntervalSince1970 - Double((self.reservation!.actualPickupTime)!) < 15){ // under 15 secs
+            confirmForTooShortTrip(cancelReservation)
+        }else{
+            cancelReservation()
+        }
+    }
+    
+    func cancelReservation() {
         cancelReservationButton.enabled = false
         
         let url = NSURL(string: "\(API.reservation)/\(self.reservation!._id!)")!
@@ -181,6 +184,25 @@ class CompleteReservationViewController: UIViewController {
                 self.presentViewController(alert, animated: true, completion: nil)
             })
         }
+    }
+    
+    func confirmForTooShortTrip(callback:()->Void) {
+        let title = "Confirmation"
+        let message = "The driving time is too short to analyze your driving behaviors.\nDo you want to stop driving now?"
+        
+        let dialog = UIAlertController(title: title, message: message, preferredStyle: .Alert)
+        let okAction = UIAlertAction(title: "Yes", style: .Default) { action in
+            callback()
+        }
+        let cancelAction = UIAlertAction(title: "No", style: .Cancel) { action in
+            // do nothing
+        }
+        dialog.addAction(okAction)
+        dialog.addAction(cancelAction)
+        
+        dispatch_async(dispatch_get_main_queue(), {
+            self.presentViewController(dialog, animated: true, completion: nil)
+        })
     }
     
     @IBAction func unlockCarAction(sender: AnyObject) {

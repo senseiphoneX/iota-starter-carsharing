@@ -1,19 +1,12 @@
 /**
  * Copyright 2016 IBM Corp. All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the IBM License, a copy of which may be obtained at:
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www14.software.ibm.com/cgi-bin/weblap/lap.pl?li_formnum=L-DDIN-ADRVKF&popup=y&title=IBM%20IoT%20for%20Automotive%20Sample%20Starter%20Apps
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You may not use this file except in compliance with the license.
  */
-
 import Foundation
 import UIKit
 import BMSCore
@@ -21,18 +14,33 @@ import BMSSecurity
 
 private var currentContext: AuthenticationContext?
 private var currentViewController: UIViewController?
-private var loginCanceled = false
 
 // Auth delegate for handling custom challenge
 class CustomAuthDelegate : AuthenticationDelegate {
+    let defalutLoginPrompt = "This sample login demonstrates custom authentication capability of Mobile Client Access.\nFor this demo, you can enter any values to connect and use the app."
+
     func onAuthenticationChallengeReceived(authContext: AuthenticationContext, challenge: AnyObject) {
-        print("onAuthenticationChallengeReceived")
+        print("onAuthenticationChallengeReceived challenge = \(challenge)")
+        print("onAuthenticationChallengeReceived ----")
         currentContext = authContext
+        var prompt = defalutLoginPrompt
+
+        // re-challnege due to login failure
+        let chal = challenge as! NSDictionary
+        let chalText = chal["text"] as! String
+        if chalText.hasPrefix("Login failed.") {
+            print("re-challenge: \(chalText)")
+            prompt = chalText
+            dispatch_async(dispatch_get_main_queue(), {
+                self.dismissInProcessAlert(nil)
+            })
+        }
+
         dispatch_async(dispatch_get_main_queue(), {
             currentViewController = self.getCurrentViewController()
         })
         dispatch_async(dispatch_get_main_queue(), {
-            self.showLoginAlert()
+            self.showLoginAlert(prompt)
         })
     }
 
@@ -44,6 +52,7 @@ class CustomAuthDelegate : AuthenticationDelegate {
         })
     }
 
+    // should not been called.  should receive re-challenge.
     func onAuthenticationFailure(info: AnyObject?) {
         print("onAuthenticationFailure info = \(info)")
         print("onAuthenticationFailure ----")
@@ -135,12 +144,7 @@ class CustomAuthDelegate : AuthenticationDelegate {
     }
 
     private func showLoginFailureAlert() {
-        var message: String
-        if loginCanceled == true {
-            message = "Login canceled"
-        } else {
-            message = "Login failed"
-        }
+        let message = "Login failed"
         dispatch_async(dispatch_get_main_queue(), {
             self.setMessage(message)
             currentViewController = nil
@@ -154,15 +158,15 @@ class CustomAuthDelegate : AuthenticationDelegate {
         getViewController()!.presentViewController(alertController, animated: true, completion: nil)
     }
 
-    private func showLoginAlert() {
+    private func showLoginAlert(message: String) {
         var usernameTextField:UITextField?
         var passwordTextField:UITextField?
-        
+
         let title = NSLocalizedString("IBM IoT for Automotive", comment: "")
         let cancelButtonTitle = NSLocalizedString("Cancel", comment: "")
         let okButtonTitle = NSLocalizedString("OK", comment: "")
 
-        let alertController = UIAlertController(title: title, message: "This sample login demonstrates custom authentication capability of Mobile Client Access.\nFor this demo, you can enter any values to connect and use the app.", preferredStyle: .Alert)
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .Alert)
 
         // Add the text field
         alertController.addTextFieldWithConfigurationHandler { textField in
@@ -185,14 +189,14 @@ class CustomAuthDelegate : AuthenticationDelegate {
         // Create the actions
         let cancelAction = UIAlertAction(title: cancelButtonTitle, style: .Cancel) { action in
             print("The \"Login\" alert's cancel action occurred.")
-            loginCanceled = true
-            // send dummy data to end authorization process
-            currentContext!.submitAuthenticationChallengeAnswer(["username":"", "password":""])
+            dispatch_async(dispatch_get_main_queue(), {
+                self.setMessage("Login canceled")
+            })
+            currentContext!.submitAuthenticationFailure(["Reason":"Login canceled"])
         }
 
         let okAction = UIAlertAction(title: okButtonTitle, style: .Default) { action in
             print("Submitting auth... username:\(usernameTextField!.text)")
-            loginCanceled = false
             dispatch_async(dispatch_get_main_queue(), {
                 self.showInProcessAlert()
             })

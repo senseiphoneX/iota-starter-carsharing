@@ -1,19 +1,12 @@
 /**
  * Copyright 2016 IBM Corp. All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the IBM License, a copy of which may be obtained at:
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www14.software.ibm.com/cgi-bin/weblap/lap.pl?li_formnum=L-DDIN-ADRVKF&popup=y&title=IBM%20IoT%20for%20Automotive%20Sample%20Starter%20Apps
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You may not use this file except in compliance with the license.
  */
-
 import UIKit
 import MapKit
 import CoreLocation
@@ -107,7 +100,8 @@ class UserOwnedCarViewController: UIViewController, CLLocationManagerDelegate {
                 drivingButton.setBackgroundImage(UIImage(named: "startDriving"), forState: UIControlState.Normal)
                 return
             }
-            self.titleLabel.text = "Speed: \(max(0, newLocation.speed * 60 * 60 / 1000)) km/h"
+            let mphSpeed = round(newLocation.speed * 60 * 60 / 16.0934)/100
+            self.titleLabel.text = "Speed: \(max(0, mphSpeed)) MPH"
             let center = CLLocationCoordinate2DMake(newLocation.coordinate.latitude, newLocation.coordinate.longitude)
             let circle = MKCircle(centerCoordinate: center, radius: 10);
             circle.title = "location"
@@ -174,11 +168,37 @@ class UserOwnedCarViewController: UIViewController, CLLocationManagerDelegate {
                 self.openAlert("Failed to connect to IoT Platform", message:"", actions:nil)
             }
         } else {
-            startedDriving = false
-            self.completeReservation(self.reservationId!, alreadyTaken: false)
-            drivingButton.setBackgroundImage(UIImage(named: "startDriving"), forState: UIControlState.Normal)
+            let comp = {()->Void in
+                self.startedDriving = false
+                self.completeReservation(self.reservationId!, alreadyTaken: false)
+                self.drivingButton.setBackgroundImage(UIImage(named: "startDriving"), forState: UIControlState.Normal)
+            }
+            if(NSDate().timeIntervalSince1970 - self.pickupTime! < 15){
+                // at least 10 secs is necessary to analyze driving behavior.
+                self.confirmForTooShortTrip(comp);
+            }else{
+                comp();
+            }
         }
+    }
+    
+    func confirmForTooShortTrip(callback:()->Void) {
+        let title = "Confirmation"
+        let message = "The driving time is too short to analyze your driving behaviors.\nDo you want to stop driving now?"
         
+        let dialog = UIAlertController(title: title, message: message, preferredStyle: .Alert)
+        let okAction = UIAlertAction(title: "Yes", style: .Default) { action in
+            callback()
+        }
+        let cancelAction = UIAlertAction(title: "No", style: .Cancel) { action in
+            // do nothing
+        }
+        dialog.addAction(okAction)
+        dialog.addAction(cancelAction)
+        
+        dispatch_async(dispatch_get_main_queue(), {
+            self.presentViewController(dialog, animated: true, completion: nil)
+        })
     }
     
     func useExistingReservation() {
@@ -242,7 +262,7 @@ class UserOwnedCarViewController: UIViewController, CLLocationManagerDelegate {
             switch statusCode {
             case 200:
                 title = "Drive completed"
-                message = "Please allow at least 30 minutes for the driver behavior data to be analyzed"
+                message = "Please allow at least 10 minutes for the driver behavior data to be analyzed"
                 self.reservationId = nil
                 break
             default:

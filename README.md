@@ -1,97 +1,118 @@
-# IoT for Automotive Starter Mobile Application
------
+# IBM IoT for Automotive - Mobility Starter Application mobile app for iOS
+
 ## Overview
-This IoT for Automotive Starter will help you get started with the **IoT for Automotive Context Mapping** and **Driver Behavior** services available on **IBM Bluemix** in order to create automotive solutions.
+The IBM IoT for Automotive - Mobility Starter Application uses the **Context Mapping** and **Driver Behavior** services that are available on **IBM Bluemix** to help you to quickly build a smart car-sharing automotive solution. The IBM IoT for Automotive - Mobility Starter Application consists of a mobile app and a server component.
 
-The IoT for Automotive Starter Mobile App is a sample source code for interacting with the IBM IoT for Automotive Starter Server Application, which enables a car-sharing service. Using the mobile app, you can search available cars near you, reserve a car, unlock and then start driving. You can also view your driving score as a part of the service.
+### Mobile app
+The starter app provides a mobile app for customers to quickly find and hire a car without human intervention from a car-hire company. If you are a car-hire customer, you can use the mobile app to do the following tasks:
 
-This sample source code for IoT for Automotive Starter Mobile App is intended solely for use with an Apple iOS product and intended to be used in conjunction with officially licensed Apple development tools and further customized and distributed under the terms and conditions of your licensed Apple iOS Developer Program or your licensed Apple iOS Enterprise Program.
+- Search for available cars by location on a GIS map
+- Search for available cars that meet your specific requirements
+- Reserve a car 
+- Unlock the car that you just hired and start driving the car
+ 
+While you drive the car, the service tracks your location and also records your driving behavior. When you reach your driving destination, you can view information about each trip that you took in the car and you can also view your driving behavior score.
 
-The sample source code for the companion IoT for Automotive Starter Server App can be found at [ibm-watson-iot/iota-starter-server](https://github.com/ibm-watson-iot/iota-starter-server).
+### Server component
+The IoT for Automotive - Mobility Starter Application mobile app interacts with the server component. The server component provides the back-end car sharing and system monitoring service that provides more features for car-hire companies. By default, the mobile app connects to a test server that is provided by IBM. You can also choose to deploy your own server instance to IBM Bluemix and connect your mobile app to that instance instead of the test system. For more information about deploying the car-sharing server component, see [ibm-watson-iot/iota-starter-server](https://github.com/ibm-watson-iot/iota-starter-server).
 
------
-## How to build and run this app
+## Prerequisites
 
-This application source code was developed using Xcode 7.3.  To run this app, follow the stepps below.
+Before you deploy the IoT for Automotive - Mobility Starter Application mobile app for iOS, ensure that the following prerequisites are met:
 
-1. Install CocoaPods if needed (See [CocoaPods](https://cocoapods.org/) for more information)
+- The sample source code for the mobile app is only supported for use with an official Apple iOS device.
+- The sample source code for the mobile app is also supported only with officially licensed Apple development tools that are customized and distributed under the terms and conditions of your licensed Apple iOS Developer Program or your licensed Apple iOS Enterprise Program.
+- Apple Xcode 7.3 integrated development environment (IDE) and [CocoaPods](https://cocoapods.org/) must be installed on the computer that you plan to clone the mobile app source repository onto.
 
-   ```$ sudo gem install cocoapods```
+## Trying the mobile app with iOS Simulator
 
-2. Clone this repo into your local environment
+You can download and install the mobile app on iOS and Android mobile devices. For more information about trying the Android version of the mobile app, see [IBM IoT for Automotive - Mobility Starter Application mobile app for Android](https://github.com/ibm-watson-iot/iota-starter-carsharing-android).
 
-   ```$ git clone https://github.com/ibm-watson-iot/iota-starter-carsharing```
+To try the IoT for Automotive - Mobility Starter Application mobile app for iOS, complete the following steps:
 
-3. Go to the project folder on the Terminal app
+1. Open a Terminal session and install CocoaPods by using the following command:   
+```$ sudo gem install cocoapods```    
+2. Clone the Mobility Starter Application source code repository for the sample mobile app by using the following git command:  
+```$ git clone https://github.com/ibm-watson-iot/iota-starter-carsharing```   
+3. Go to your Mobility Starter Application project folder, and then enter the following commands:   
+```$ pod install```  
+```$ open MobileStarterApp.xcworkspace```
 
-4. ```$ pod install```
+4. Edit the **API.swift file**, and set the `connectedAppURL variableinsert` property to the URL for your IoT for Automotive - Mobility Starter Application server app.
 
-5. ```$ open MobileStarterApp.xcworkspace```
+5. Go to the upper left of the Xcode UI, click **Run**.
 
-6. Set a URL of an instance of **IoT for Automotive Starter Server App** to the _connectedAppURL_ variable in **API.swift** file.
+6. Optional: If you would like to be notified about certain events, for example, severe weather at the pickup location, enable push notifications, as outlined in the next procedure.
 
-7. Click the run button at the top left of the Xcode UI.
-
-**Note: Please make sure that you are running Xcode 7.3+**
+To view a video recording that demonstrates how to complete the steps to deploy the mobile app, click play:
 
 [![](XcodePreview.jpg)](https://www.youtube.com/watch?v=9O5uoPsn0LA "Instructions")  
 
-### (Optional) Setup Push Notifications
-You can enable push notifications to the mobile app when the weather at the drop off time of your car reservation becomes bad. Follow the steps below to make the Push Notifications ready for use. See [Push Notifications](https://console.ng.bluemix.net/docs/services/mobilepush/t_push_provider_ios.html) for more information.
+### Setting up push notifications
 
-1. Register an App ID enabled Push Notifications on [Apple Developer](https://developer.apple.com/) portal
+You can optionally enable Apple Push Notifications (APN) to warn users about severe weather conditions that might be occurring at the drop off time and location of the car reservation.
 
-2. Create a development APNs SSL certificate
+To enable push notifications, complete the following steps:
 
-3. Create a development provisioning profile
+1. Register your app ID for APNs on the [Apple Developer portal](https://developer.apple.com/).
 
-4. Setting up APNs on the Bluxmix Push Notifications Dashboard binded to your server application
+2. Create an APN development SSL certificate.
 
-5. Connect your iOS phone to your Mac
+3. Create an APN development provisioning profile.
 
-6. Change Bundle Identifier of the Xcode project to your App ID
+4. Go to the Bluemix Push Notifications Dashboard and bind the APNs that you created to your server app.
 
-7. Build and run the mobile app targeting to your iOS phone
+5. Connect your iOS mobile device to your Apple Mac.
 
-8. Tap "Specify Server" button on the mobile app
+6. Change the bundle ID of the Xcode project to your app ID.
 
-9. Tap QR code image, then camera function will be launched
+7. In Xcode, select your iOS device as the build target and press **Build and run**.
 
-10. Open your server app (https://&lt;your-app-route&gt;.mybluemix.net/) by PC browser and scroll down to show a QR code
+8. On the mobile app, tap **Specify Server**.
 
-11. Read the QR code by the mobile app
+9. To start the camera function, tap the QR code image.
 
----
-This mobile app contains simple demonstration of Mobile Client Access service. It logins with username and password using Mobile Client Access for custom authentication.
+10. From a browser, connect to the server application and display the QR code:
+  - If you are connecting your mobile app to the predeployed IBM test Mobility Starter Application server,  can find the QR code on the Starter Experience home page.
+  - If you are connecting your mobile app to your own server instance, you can find the QR code for your server instance at the bottom of the following page: `https://&lt;your-app-route&gt;.mybluemix.net/`
+  
+11. Scan the QR code from your mobile app.
+
+For more information, see [Push notifications](https://console.ng.bluemix.net/docs/services/mobilepush/t_push_provider_ios.html).
+
+### Mobile Client Access service
+
+The IoT for Automotive - Mobility Starter Application car sharing mobile app provides a simple demonstration of the Mobile Client Access service. The app logs in with the user name and password by using the  Mobile Client Access for custom authentication.
 
 * [CustomAuthDelegate.swift](MobileStarterApp/CustomAuthDelegate.swift) onAuthenticationChallengeReceived()  
-Call submitAuthenticationChallengeAnswer() with username and password entered in Login alert.
+Call `submitAuthenticationChallengeAnswer()` with the user name and password that you entered in the login alert.
 
 * [QRCodeReaderViewController.swift](MobileStarterApp/QRCodeReaderViewController.swift) configureVideoCapture()  
-Set whether use custom authentication or not in okAction.
+Set whether to use custom authentication for the `okAction` function.
 
 * [API.swift](MobileStarterApp/API.swift) doInitialize()  
 Initialize the Mobile Client Access client SDK.
 
-See [Configuring the Mobile Client Access client SDK for iOS](https://console.ng.bluemix.net/docs/services/mobileaccess/custom-auth-ios-swift-sdk.html) for more information.
+For more information, see [Configuring the Mobile Client Access client SDK for iOS](https://console.ng.bluemix.net/docs/services/mobileaccess/custom-auth-ios-swift-sdk.html).
 
-Also need to add and configure Mobile Client Access for custom authentication on IoT for Automotive Starter app server.
-See [IoT for Automotive Starter app]( https://github.com/ibm-watson-iot/iota-starter-server).
+You also need to add and configure Mobile Client Access for custom authentication on the IoT for Automotive - Mobility Starter Application server. For more information, see [IoT for Automotive - Mobility Starter Application server]( https://github.com/ibm-watson-iot/iota-starter-server).
 
-----
-## Report Bugs
-If you find a bug, please report it using the [Issues section](https://github.com/ibm-watson-iot/iota-starter-carsharing/issues).
+## Reporting defects
+To report a defect with the IoT for Automotive - Mobility Starter Application mobile app, go to the [Issues](https://github.com/ibm-watson-iot/iota-starter-carsharing/issues) section.
 
-----
-## Privacy Notice
-The IoT for Automotive Starter app on Bluemix stores your driving history obtained using this Mobile App.
+## Privacy notice
+The IoT for Automotive - Mobility Starter Application on Bluemix stores all of the driving data that is obtained while you use the mobile app.
 
-----
+## Apple Developer Program License Notice
+
+IBM is delivering this sample source code for IoT for Automotive Starter Mobile Application to Client for further development, build and test. Client understands and confirms that further development (whether performed by the Client or by IBM acting on the Client's behalf) is undertaken under the Client's Apple Developer Program or Apple Developer Enterprise Program Agreement. The Client confirms that they have all appropriate Apple Developer Program license(s) and that the Client, as Apple's licensee, is subject to, and will comply with, the terms of the appropriate Apple Developer Program Agreement.
+
 ## Useful links
-[IBM IoT for Automotive](http://www.ibm.com/internet-of-things/iot-industry/iot-automotive)
-[IBM Watson Internet of Things](http://www.ibm.com/internet-of-things/)  
-[IBM Watson IoT Platform](http://www.ibm.com/internet-of-things/iot-solutions/watson-iot-platform/)   
-[IBM Watson IoT Platform Developers Community](https://developer.ibm.com/iotplatform/)
-[IBM Bluemix](https://bluemix.net/)  
-[IBM Bluemix Documentation](https://www.ng.bluemix.net/docs/)  
-[IBM Bluemix Developers Community](http://developer.ibm.com/bluemix)  
+
+- [IBM IoT for Automotive](http://www.ibm.com/internet-of-things/iot-industry/iot-automotive)
+- [IBM Watson Internet of Things](http://www.ibm.com/internet-of-things/)  
+- [IBM Watson IoT Platform](http://www.ibm.com/internet-of-things/iot-solutions/watson-iot-platform/)   
+- [IBM Watson IoT Platform Developers Community](https://developer.ibm.com/iotplatform/)
+- [IBM Bluemix](https://bluemix.net/)  
+- [IBM Bluemix documentation](https://www.ng.bluemix.net/docs/)  
+- [IBM Bluemix developers community](http://developer.ibm.com/bluemix)  

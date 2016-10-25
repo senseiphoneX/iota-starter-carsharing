@@ -1,19 +1,12 @@
 /**
  * Copyright 2016 IBM Corp. All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the IBM License, a copy of which may be obtained at:
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www14.software.ibm.com/cgi-bin/weblap/lap.pl?li_formnum=L-DDIN-ADRVKF&popup=y&title=IBM%20IoT%20for%20Automotive%20Sample%20Starter%20Apps
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You may not use this file except in compliance with the license.
  */
-
 import UIKit
 
 class ProfileViewController: UIViewController, MessageViewController {
@@ -94,7 +87,8 @@ class ProfileViewController: UIViewController, MessageViewController {
                                 ($1 as! NSNumber).compare($0 as! NSNumber)
                             }
 
-                        self.fetchingLabel.text = "Your score is \(Int(round(stat.scoring!.score!))) for \(round(stat.totalDistance!/10)/100) km."
+                        let totalMiles = round(stat.totalDistance!/16.09344)/100
+                        self.fetchingLabel.text = "Your score is \(Int(round(stat.scoring!.score!))) for \(totalMiles) miles."
                         
                         self.tableView.reloadData()
                     })
@@ -145,7 +139,8 @@ class ProfileViewController: UIViewController, MessageViewController {
             }
             value = "\(Int(round(((dict?.valueForKey(key))! as! Double) / totalDistance! * 100)))%"
             if allInfo {
-                value.appendContentsOf(" (\(round(((dict?.valueForKey(key))! as! Double)/10)/100) km)")
+                let miles = round(((dict?.valueForKey(key))! as! Double)/16.0934)/100
+                value.appendContentsOf(" (\(miles) miles)")
             }
         }
         return (key, value)
