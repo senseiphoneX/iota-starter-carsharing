@@ -22,13 +22,13 @@ Before you deploy the IoT for Automotive - Mobility Starter Application mobile a
 
 - The sample source code for the mobile app is only supported for use with an official Apple iOS device.
 - The sample source code for the mobile app is also supported only with officially licensed Apple development tools that are customized and distributed under the terms and conditions of your licensed Apple iOS Developer Program or your licensed Apple iOS Enterprise Program.
-- Apple Xcode 7.3 integrated development environment (IDE) and [CocoaPods](https://cocoapods.org/) must be installed on the computer that you plan to clone the mobile app source repository onto.
+- Apple Xcode 8.0 integrated development environment (IDE) and [CocoaPods](https://cocoapods.org/) must be installed on the computer that you plan to clone the mobile app source repository onto.
 
-## Trying the mobile app with iOS Simulator
+## Deploying the mobile app
 
 You can download and install the mobile app on iOS and Android mobile devices. For more information about trying the Android version of the mobile app, see [IBM IoT for Automotive - Mobility Starter Application mobile app for Android](https://github.com/ibm-watson-iot/iota-starter-carsharing-android).
 
-To try the IoT for Automotive - Mobility Starter Application mobile app for iOS, complete the following steps:
+To try the IoT for Automotive - Mobility Starter Application mobile app for iOS with iOS Simulator, complete the following steps:
 
 1. Open a Terminal session and install CocoaPods by using the following command:   
 ```$ sudo gem install cocoapods```    
@@ -38,11 +38,13 @@ To try the IoT for Automotive - Mobility Starter Application mobile app for iOS,
 ```$ pod install```  
 ```$ open MobileStarterApp.xcworkspace```
 
-4. Edit the **API.swift file**, and set the `connectedAppURL variableinsert` property to the URL for your IoT for Automotive - Mobility Starter Application server app.
+4. Edit the **API.swift file**, and set the `connectedAppURL` property to the URL for your IoT for Automotive - Mobility Starter Application server app.
 
 5. Go to the upper left of the Xcode UI, click **Run**.
 
-6. Optional: If you would like to be notified about certain events, for example, severe weather at the pickup location, enable push notifications, as outlined in the next procedure.
+6. To deploy the mobile app on your device, see [Launching Your App on Devices](https://developer.apple.com/library/content/documentation/IDEs/Conceptual/AppDistributionGuide/LaunchingYourApponDevices/LaunchingYourApponDevices.html).
+
+7. Optional: If you would like to be notified about certain events, for example, severe weather at the pickup location, enable push notifications, as outlined in the next procedure.
 
 To view a video recording that demonstrates how to complete the steps to deploy the mobile app, click play:
 

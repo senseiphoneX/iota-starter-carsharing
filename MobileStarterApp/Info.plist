@@ -19,13 +19,15 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>20160930</string>
+	<string>20161025</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Using your location, we will analyze your driving behavior</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Using your location, we will recommend cars nearby.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Read QR code to specify another server</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>
