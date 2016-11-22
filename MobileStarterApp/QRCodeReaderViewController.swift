@@ -54,34 +54,44 @@ class QRCodeReaderViewController: UIViewController, AVCaptureMetadataOutputObjec
 
             alert.addTextFieldWithConfigurationHandler { textField in
                 routeTextField = textField
-                routeTextField?.placeholder = NSLocalizedString("Route", comment: "")
-                if let appRoute: String = NSUserDefaults.standardUserDefaults().valueForKey("appRoute") as? String {
+                routeTextField?.placeholder = NSLocalizedString("Application Route", comment: "")
+                if let appRoute: String = NSUserDefaults.standardUserDefaults().valueForKey(USER_DEFAULTS_KEY_APP_ROUTE) as? String {
                     routeTextField?.text = appRoute
                 }
             }
 
-            // Add the text field for entering the GUID manually
-            var guidTextField: UITextField?
+            // Add the text field for entering the Push Notifications App Guid manually
+            var pushGuidTextField: UITextField?
 
             alert.addTextFieldWithConfigurationHandler { textField in
-                guidTextField = textField
-                guidTextField?.placeholder = NSLocalizedString("App GUID", comment: "")
-                if let appGUID: String = NSUserDefaults.standardUserDefaults().valueForKey("appGUID") as? String {
-                    guidTextField?.text = appGUID
+                pushGuidTextField = textField
+                pushGuidTextField?.placeholder = NSLocalizedString("Push App Guid (optional)", comment: "")
+                if let pushAppGUID: String = NSUserDefaults.standardUserDefaults().valueForKey(USER_DEFAULTS_KEY_PUSH_APP_GUID) as? String {
+                    pushGuidTextField?.text = pushAppGUID
                 }
             }
 
-            // Add the text field for enabling MCA
-            var customAuthTextField: UITextField?
+            // Add the text field for entering the Push Notifications Client Secret manually
+            var pushClientSecretTextField: UITextField?
             
             alert.addTextFieldWithConfigurationHandler { textField in
-                customAuthTextField = textField
-                customAuthTextField?.placeholder = NSLocalizedString("Custom auth. 'true'(optional)", comment: "")
-                if let customAuth: String = NSUserDefaults.standardUserDefaults().valueForKey("customAuth") as? String {
-                    customAuthTextField?.text = customAuth
+                pushClientSecretTextField = textField
+                pushClientSecretTextField?.placeholder = NSLocalizedString("Push Client Secret (optional)", comment: "")
+                if let pushClientSecret: String = NSUserDefaults.standardUserDefaults().valueForKey(USER_DEFAULTS_KEY_PUSH_CLIENT_SECRET) as? String {
+                    pushClientSecretTextField?.text = pushClientSecret
                 }
             }
-
+            
+            // Add the text field for entering the MCA Tenant Id manually
+            var mcaTenantIdTextField: UITextField?
+            
+            alert.addTextFieldWithConfigurationHandler { textField in
+                mcaTenantIdTextField = textField
+                mcaTenantIdTextField?.placeholder = NSLocalizedString("MCA Tenant Id (optional)", comment: "")
+                if let mcaTenantId: String = NSUserDefaults.standardUserDefaults().valueForKey(USER_DEFAULTS_KEY_MCA_TENANT_ID) as? String {
+                    mcaTenantIdTextField?.text = mcaTenantId
+                }
+            }
 
             // Create the actions.
             let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel) { action in
@@ -90,20 +100,15 @@ class QRCodeReaderViewController: UIViewController, AVCaptureMetadataOutputObjec
             
             let okAction = UIAlertAction(title: "OK", style: .Default) { action in
                 let appRoute = routeTextField?.text
-                let appGUID = guidTextField?.text
-                var customAuth = ""
-                if customAuthTextField?.text == "true" {
-                    customAuth = "true"
-                }
+                let pushAppGuid = pushGuidTextField?.text
+                let pushClientSecret = pushClientSecretTextField?.text
+                let mcaTenatId = mcaTenantIdTextField?.text
                 let userDefaults = NSUserDefaults.standardUserDefaults()
                 if appRoute != "" {
-                    userDefaults.setValue(appRoute, forKey: "appRoute")
-                    userDefaults.setValue(appGUID, forKey: "appGUID")
-                    if customAuth == "true" {
-                        userDefaults.setValue("true", forKey: "customAuth")
-                    } else {
-                        userDefaults.removeObjectForKey("customAuth")
-                    }
+                    userDefaults.setValue(appRoute, forKey: USER_DEFAULTS_KEY_APP_ROUTE)
+                    userDefaults.setValue(pushAppGuid, forKey: USER_DEFAULTS_KEY_PUSH_APP_GUID)
+                    userDefaults.setValue(pushClientSecret, forKey: USER_DEFAULTS_KEY_PUSH_CLIENT_SECRET)
+                    userDefaults.setValue(mcaTenatId, forKey: USER_DEFAULTS_KEY_MCA_TENANT_ID)
                 }
                 userDefaults.synchronize()
                 self.navigationController?.popViewControllerAnimated(true)
@@ -155,31 +160,23 @@ class QRCodeReaderViewController: UIViewController, AVCaptureMetadataOutputObjec
             if objMetadataMachineReadableCodeObject.stringValue != nil {
                 let fullString = objMetadataMachineReadableCodeObject.stringValue.componentsSeparatedByString(",")
                 
-                if fullString[0] == "1" {
-                    switch (fullString.count) {
-                    case 2:
-                        let appRoute = fullString[1]
-                        NSUserDefaults.standardUserDefaults().setValue(appRoute, forKey: "appRoute")
-                        NSUserDefaults.standardUserDefaults().removeObjectForKey("appGUID")
-                        NSUserDefaults.standardUserDefaults().removeObjectForKey("customAuth")
-                        break;
-                    case 3:
-                        let appRoute = fullString[1]
-                        let appGUID = fullString[2]
-                        NSUserDefaults.standardUserDefaults().setValue(appRoute, forKey: "appRoute")
-                        NSUserDefaults.standardUserDefaults().setValue(appGUID, forKey: "appGUID")
-                        NSUserDefaults.standardUserDefaults().removeObjectForKey("customAuth")
-                        break;
-                    case 4:
-                        let appRoute = fullString[1]
-                        let appGUID = fullString[2]
-                        let customAuth = fullString[3]
-                        NSUserDefaults.standardUserDefaults().setValue(appRoute, forKey: "appRoute")
-                        NSUserDefaults.standardUserDefaults().setValue(appGUID, forKey: "appGUID")
-                        NSUserDefaults.standardUserDefaults().setValue(customAuth, forKey: "customAuth")
-                        break;
-                    default:
-                        break;
+                if fullString.count == 5 && fullString[0] == "1" && fullString[1] != ""{
+                    let appRoute = fullString[1]
+                    NSUserDefaults.standardUserDefaults().setValue(appRoute, forKey: USER_DEFAULTS_KEY_APP_ROUTE)
+                    let pushAppGuid = fullString[2]
+                    let pushClientSecret = fullString[3]
+                    if(pushAppGuid == "" && pushClientSecret == ""){
+                        NSUserDefaults.standardUserDefaults().removeObjectForKey(USER_DEFAULTS_KEY_PUSH_APP_GUID)
+                        NSUserDefaults.standardUserDefaults().removeObjectForKey(USER_DEFAULTS_KEY_PUSH_CLIENT_SECRET)
+                    }else if(pushAppGuid != "" && pushClientSecret != ""){
+                        NSUserDefaults.standardUserDefaults().setValue(pushAppGuid, forKey: USER_DEFAULTS_KEY_PUSH_APP_GUID)
+                        NSUserDefaults.standardUserDefaults().setValue(pushClientSecret, forKey: USER_DEFAULTS_KEY_PUSH_CLIENT_SECRET)
+                    }
+                    let mcaTenantId = fullString[4]
+                    if(mcaTenantId == ""){
+                        NSUserDefaults.standardUserDefaults().removeObjectForKey(USER_DEFAULTS_KEY_MCA_TENANT_ID)
+                    }else{
+                        NSUserDefaults.standardUserDefaults().setValue(mcaTenantId, forKey: USER_DEFAULTS_KEY_MCA_TENANT_ID)
                     }
                     NSUserDefaults.standardUserDefaults().synchronize()
                 }

@@ -6,9 +6,9 @@ target 'MobilityStarterApp' do
   use_frameworks!
 
   # Pods for MobilityStarterApp
-  pod 'BMSCore', '1.0.2'
-  pod 'BMSSecurity', '1.1.0'
-  pod 'BMSPush', '1.0.3'
+  pod 'BMSCore', '2.0.2'
+  pod 'BMSSecurity', '2.0.2'
+  pod 'BMSPush', '2.0.01'
   pod 'CocoaMQTT', '1.0.7'
 end
 post_install do |installer|

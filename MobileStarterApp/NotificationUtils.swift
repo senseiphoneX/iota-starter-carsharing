@@ -11,6 +11,7 @@ import Foundation
 import UIKit
 import BMSCore
 import BMSPush
+import UserNotifications
 
 class NotificationUtils{
     private init(){}
@@ -51,8 +52,11 @@ class NotificationUtils{
     }
     static func initRemoteNotification(){
         let bmsClient = BMSClient.sharedInstance
-        bmsClient.initializeWithBluemixAppRoute(API.connectedAppURL, bluemixAppGUID: API.connectedAppGUID, bluemixRegion: API.bmRegion)
-        bmsClient.defaultRequestTimeout = 10.0
+        bmsClient.initialize(bluemixRegion: API.bmRegion)
+        bmsClient.requestTimeout = 10.0
+        
+        let push = BMSPushClient.sharedInstance
+        push.initializeWithAppGUID(appGUID: API.connectedPushAppGUID, clientSecret: API.connectedPushClientSecret)
 
         let openReservationAction = UIMutableUserNotificationAction()
         openReservationAction.identifier = ACTION_OPEN_RESERVATION
@@ -75,13 +79,20 @@ class NotificationUtils{
         let okCategory = UIMutableUserNotificationCategory()
         okCategory.identifier = CATEGORY_OK
         okCategory.setActions([okAction], forContext: .Minimal)
-        
-        UIApplication.sharedApplication().registerUserNotificationSettings(UIUserNotificationSettings(forTypes: [.Sound, .Alert, .Badge], categories: Set([openReservationCategory, okCategory])))
-        UIApplication.sharedApplication().registerForRemoteNotifications()
+
+        if #available(iOS 10.0, *) {
+            UNUserNotificationCenter.currentNotificationCenter().requestAuthorizationWithOptions([.Alert, .Sound, .Badge])
+            {(granted, error) in
+                UIApplication.sharedApplication().registerForRemoteNotifications()
+            }
+        } else {
+            UIApplication.sharedApplication().registerUserNotificationSettings(UIUserNotificationSettings(forTypes: [.Sound, .Alert, .Badge], categories: Set([openReservationCategory, okCategory])))
+            UIApplication.sharedApplication().registerForRemoteNotifications()
+        }
     }
     static func getDeviceId() -> String?{
         let authManager  = BMSClient.sharedInstance.authorizationManager
-        let devId = authManager.deviceIdentity.id
+        let devId = authManager.deviceIdentity.ID
         return devId
     }
 }

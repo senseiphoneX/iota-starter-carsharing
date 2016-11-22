@@ -159,9 +159,10 @@ class CompleteReservationViewController: UIViewController {
                     NotificationUtils.cancelNotification([
                         "reservationId":(self.reservation?._id)!,
                         "type": reservationType,
-                        "appRoute": API.connectedAppURL,
-                        "appGUID": API.connectedAppGUID,
-                        "customAuth": API.connectedCustomAuth
+                        USER_DEFAULTS_KEY_APP_ROUTE: API.connectedAppURL,
+                        USER_DEFAULTS_KEY_PUSH_APP_GUID: API.connectedPushAppGUID,
+                        USER_DEFAULTS_KEY_PUSH_CLIENT_SECRET: API.connectedPushClientSecret,
+                        USER_DEFAULTS_KEY_MCA_TENANT_ID: API.connectedMcaTenantId
                     ])
                  }
                 ViewController.completeDrive((self.reservation?.carDetails!.deviceID)!);
@@ -244,9 +245,10 @@ class CompleteReservationViewController: UIViewController {
                         NotificationUtils.cancelNotification([
                             "reservationId":reservationId!,
                             "type":"pickup",
-                            "appRoute": API.connectedAppURL,
-                            "appGUID": API.connectedAppGUID,
-                            "customAuth": API.connectedCustomAuth
+                            USER_DEFAULTS_KEY_APP_ROUTE: API.connectedAppURL,
+                            USER_DEFAULTS_KEY_PUSH_APP_GUID: API.connectedPushAppGUID,
+                            USER_DEFAULTS_KEY_PUSH_CLIENT_SECRET: API.connectedPushClientSecret,
+                            USER_DEFAULTS_KEY_MCA_TENANT_ID: API.connectedMcaTenantId
                         ])
                         ReservationUtils.setDropoffNotification(self.reservation!)
                     }

@@ -54,7 +54,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application (application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: NSData){
         let push = BMSPushClient.sharedInstance
         print("Register Device Token: \(deviceToken)")
-        push.registerDeviceToken(deviceToken){(response, statusCode, error) -> Void in
+        push.registerWithDeviceToken(deviceToken){(response, statusCode, error) -> Void in
             if error.isEmpty{
                 print("Response during device registration: \(response)")
                 print("status code during device registration: \(statusCode)")
@@ -108,26 +108,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let label = (notification.alertAction != nil) ? notification.alertAction! : "OK"
             ReservationUtils.showReservationAlert(label, description:notification.alertBody!, handler: handler)
         case .Inactive:
-            let appRoute = userInfo["appRoute"]!
-            let appGUID = userInfo["appGUID"]!
-            let customAuth = userInfo["customAuth"]!
-            specifyServer(appRoute, appGUID: appGUID, customAuth: customAuth)
+            let appRoute = userInfo[USER_DEFAULTS_KEY_APP_ROUTE]!
+            let pushAppGuid = userInfo[USER_DEFAULTS_KEY_PUSH_APP_GUID]!
+            let pushClientSecret = userInfo[USER_DEFAULTS_KEY_PUSH_CLIENT_SECRET]!
+            let mcaTenantId = userInfo[USER_DEFAULTS_KEY_MCA_TENANT_ID]!
+            specifyServer(appRoute, pushAppGuid: pushAppGuid, pushClientSecret: pushClientSecret, mcaTenantId: mcaTenantId)
             NotificationUtils.cancelNotification(userInfo)
             fallthrough
         case .Background:
             handler(UIAlertAction())
         }
     }
-    func specifyServer(appRoute:String, appGUID:String, customAuth:String){
+    func specifyServer(appRoute:String, pushAppGuid:String, pushClientSecret:String, mcaTenantId:String){
         let userDefaults = NSUserDefaults.standardUserDefaults()
         if appRoute != "" {
-            userDefaults.setValue(appRoute, forKey: "appRoute")
-            userDefaults.setValue(appGUID, forKey: "appGUID")
-            if customAuth == "true" {
-                userDefaults.setValue(customAuth, forKey: "customAuth")
-            } else {
-                userDefaults.removeObjectForKey("customAuth")
-            }
+            userDefaults.setValue(appRoute, forKey: USER_DEFAULTS_KEY_APP_ROUTE)
+            userDefaults.setValue(pushAppGuid, forKey: USER_DEFAULTS_KEY_PUSH_APP_GUID)
+            userDefaults.setValue(pushClientSecret, forKey: USER_DEFAULTS_KEY_PUSH_CLIENT_SECRET)
+            userDefaults.setValue(mcaTenantId, forKey: USER_DEFAULTS_KEY_MCA_TENANT_ID)
         }
         userDefaults.synchronize()
         self.window?.rootViewController?.childViewControllers[0].performSegueWithIdentifier("showHomeTab", sender: self)

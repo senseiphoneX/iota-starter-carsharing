@@ -15,7 +15,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.3.0</string>
+	<string>1.3.1</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
@@ -26,11 +26,12 @@
 	<string>Using your location, we will analyze your driving behavior</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Using your location, we will recommend cars nearby.</string>
-	<key>NSCameraUsageDescription</key>
-	<string>Read QR code to specify another server</string>
+    <key>NSCameraUsageDescription</key>
+    <string>Read QR code to specify another server</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>
+		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>

@@ -38,7 +38,7 @@ To try the IoT for Automotive - Mobility Starter Application mobile app for iOS 
 ```$ pod install```  
 ```$ open MobileStarterApp.xcworkspace```
 
-4. Edit the **API.swift file**, and set the `connectedAppURL` property to the URL for your IoT for Automotive - Mobility Starter Application server app.
+4. Edit the **API.swift file**, and set the `defaultAppURL` property to the URL for your IoT for Automotive - Mobility Starter Application server app.
 
 5. Go to the upper left of the Xcode UI, click **Run**.
 
@@ -76,7 +76,7 @@ To enable push notifications, complete the following steps:
 
 10. From a browser, connect to the server application and display the QR code:
   - If you are connecting your mobile app to the predeployed IBM test Mobility Starter Application server,  can find the QR code on the Starter Experience home page.
-  - If you are connecting your mobile app to your own server instance, you can find the QR code for your server instance at the bottom of the following page: `https://&lt;your-app-route&gt;.mybluemix.net/`
+  - If you are connecting your mobile app to your own server instance, you can find the QR code for your server instance at the bottom of the following page: `https://<your-app-route>.mybluemix.net/`
   
 11. Scan the QR code from your mobile app.
 

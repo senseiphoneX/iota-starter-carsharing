@@ -12,17 +12,24 @@ import UIKit
 import BMSCore
 import BMSSecurity
 
+let USER_DEFAULTS_KEY_APP_ROUTE = "appRoute"
+let USER_DEFAULTS_KEY_PUSH_APP_GUID = "pushAppGuid"
+let USER_DEFAULTS_KEY_PUSH_CLIENT_SECRET = "pushClientSecret"
+let USER_DEFAULTS_KEY_MCA_TENANT_ID = "mcaTenantId"
+
 struct API {
     static var moveToRootOnError = true
-    static let defaultAppURL = "https://iota-starter-server.mybluemix.net"
-    static let defaultAppGUID = ""
-    static var defaultCustomAuth = "" // non-MCA server
-    static var bmRegion = BMSClient.REGION_US_SOUTH
+    //static let defaultAppURL = "https://iota-starter-server.mybluemix.net"
+    static let defaultPushAppGUID = ""
+    static let defaultPushClientSecret = ""
+    static let defaultMcaTenantId = ""
+    static var bmRegion = BMSClient.Region.usSouth
     static var customRealm = "custauth"
 
     static var connectedAppURL = defaultAppURL
-    static var connectedAppGUID = defaultAppGUID
-    static var connectedCustomAuth = defaultCustomAuth
+    static var connectedPushAppGUID = defaultPushAppGUID
+    static var connectedPushClientSecret = defaultPushClientSecret
+    static var connectedMcaTenantId = defaultMcaTenantId
     
     static var carsNearby = "\(connectedAppURL)/user/carsnearby"
     static var reservation = "\(connectedAppURL)/user/reservation"
@@ -52,8 +59,9 @@ struct API {
 
     static func setDefaultServer () {
         connectedAppURL = defaultAppURL
-        connectedAppGUID = defaultAppGUID
-        connectedCustomAuth = defaultCustomAuth
+        connectedPushAppGUID = defaultPushAppGUID
+        connectedPushClientSecret = defaultPushClientSecret
+        connectedMcaTenantId = defaultMcaTenantId
         moveToRootOnError = true
         setURIs(connectedAppURL)
     }
@@ -73,20 +81,23 @@ struct API {
 
     static func doInitialize() {
         let userDefaults = NSUserDefaults.standardUserDefaults()
-        let appRoute = userDefaults.valueForKey("appRoute") as? String
-        let appGUID = userDefaults.valueForKey("appGUID") as? String
-        let customAuth = userDefaults.valueForKey("customAuth") as? String
+        let appRoute = userDefaults.valueForKey(USER_DEFAULTS_KEY_APP_ROUTE) as? String
+        let pushAppGUID = userDefaults.valueForKey(USER_DEFAULTS_KEY_PUSH_APP_GUID) as? String
+        let pushClientSecret = userDefaults.valueForKey(USER_DEFAULTS_KEY_PUSH_CLIENT_SECRET) as? String
+        let mcaTenantId = userDefaults.valueForKey(USER_DEFAULTS_KEY_MCA_TENANT_ID) as? String
         moveToRootOnError = true
         if(appRoute != nil){
             connectedAppURL = appRoute!
-            connectedAppGUID = appGUID == nil ? "" : appGUID!
-            connectedCustomAuth = customAuth == nil ? "false" : customAuth!
+            connectedPushAppGUID = pushAppGUID == nil ? "" : pushAppGUID!
+            connectedPushClientSecret = pushClientSecret == nil ? "" : pushClientSecret!
+            connectedMcaTenantId = mcaTenantId == nil ? "" : mcaTenantId!
             setURIs(connectedAppURL)
         }
-        if connectedCustomAuth == "true" {
+        if connectedMcaTenantId != "" {
             print("initialize and set up MCA")
-            BMSClient.sharedInstance.initializeWithBluemixAppRoute(connectedAppURL, bluemixAppGUID: connectedAppGUID, bluemixRegion: bmRegion)
-            BMSClient.sharedInstance.authorizationManager = MCAAuthorizationManager.sharedInstance
+            let mcaAuthManager = MCAAuthorizationManager.sharedInstance
+            mcaAuthManager.initialize(tenantId: connectedMcaTenantId, bluemixRegion: bmRegion)
+            BMSClient.sharedInstance.authorizationManager = mcaAuthManager
             delegateCustomAuthHandler()
             // uncomment the next line if make that login is always necessary after restart this application
             // MCAAuthorizationManager.sharedInstance.logout(nil)
@@ -100,7 +111,7 @@ struct API {
         let request = Request(url: customResourceURL, method: HttpMethod.GET)
         
         print("get to /user/login")
-        let callBack:BmsCompletionHandler = {(response: Response?, error: NSError?) in
+        let callBack: BMSCompletionHandler = {(response: Response?, error: NSError?) in
             if error == nil {
                 print ("response :: \(response?.responseText), no error")
                 if let newRequest = requestAfterLogin {
@@ -110,7 +121,7 @@ struct API {
                 }
             }
         }
-        request.sendWithCompletionHandler(callBack)
+        request.send(completionHandler: callBack)
     }
    
     static func handleError(error: NSError) {
@@ -200,11 +211,11 @@ struct API {
         request.setValue(getUUID(), forHTTPHeaderField: "iota-starter-uuid")
         print("using UUID: \(getUUID())")
         
-        if connectedCustomAuth == "true" {
+        if connectedMcaTenantId != "" {
             print("doRequest(BMS)")
             let bmsRequest = toBMSRequest(request)
             // Convert callback for NSURLSession dataTaskWithRequest(request) to callback for BMSCore sendWithCompletionHandler() or sendData()
-            let bmsCallback: BmsCompletionHandler = {(response: Response?, error: NSError?) in
+            let bmsCallback: BMSCompletionHandler = {(response: Response?, error: NSError?) in
                 if error == nil {
                     let nsResponse = NSHTTPURLResponse(URL: request.URL!, statusCode: response!.statusCode!, HTTPVersion: "HTTP/?.?", headerFields: response!.headers as! [String : String])!
                     
@@ -239,10 +250,10 @@ struct API {
             }
             if request.HTTPBody == nil {
                 print("doRequest(BMS) no HTTPBody")
-                bmsRequest.sendWithCompletionHandler(bmsCallback)
+                bmsRequest.send(completionHandler: bmsCallback)
             } else {
                 print("doRequest(BMS) HTTPBody \(NSString(data: request.HTTPBody!, encoding: NSUTF8StringEncoding) as? String)")
-                bmsRequest.sendData(request.HTTPBody!, completionHandler: bmsCallback)
+                bmsRequest.send(requestBody: request.HTTPBody!, completionHandler: bmsCallback)
             }
         } else {
             let task = NSURLSession.sharedSession().dataTaskWithRequest(request) { data, response, error in

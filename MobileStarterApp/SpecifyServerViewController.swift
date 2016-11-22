@@ -25,7 +25,7 @@ class SpecifyServerViewController: UIViewController {
         navigationController?.navigationBar.backItem?.title = ""
         self.title = "Specify Server"
         
-        if let appRoute: String = NSUserDefaults.standardUserDefaults().valueForKey("appRoute") as? String {
+        if let appRoute: String = NSUserDefaults.standardUserDefaults().valueForKey(USER_DEFAULTS_KEY_APP_ROUTE) as? String {
             if let url : NSURL = NSURL(string: appRoute) {
                 if UIApplication.sharedApplication().canOpenURL(url) {
                     if(serverSpecified){
@@ -55,9 +55,10 @@ class SpecifyServerViewController: UIViewController {
     }
     
     @IBAction func useDefaultAction(sender: AnyObject) {
-        NSUserDefaults.standardUserDefaults().removeObjectForKey("appRoute")
-        NSUserDefaults.standardUserDefaults().removeObjectForKey("appGUID")
-        NSUserDefaults.standardUserDefaults().removeObjectForKey("customAuth")
+        NSUserDefaults.standardUserDefaults().removeObjectForKey(USER_DEFAULTS_KEY_APP_ROUTE)
+        NSUserDefaults.standardUserDefaults().removeObjectForKey(USER_DEFAULTS_KEY_PUSH_APP_GUID)
+        NSUserDefaults.standardUserDefaults().removeObjectForKey(USER_DEFAULTS_KEY_PUSH_CLIENT_SECRET)
+        NSUserDefaults.standardUserDefaults().removeObjectForKey(USER_DEFAULTS_KEY_MCA_TENANT_ID)
         API.setDefaultServer()
         API.doInitialize()
     }

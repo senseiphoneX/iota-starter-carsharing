@@ -86,7 +86,18 @@ class ReservationUtils {
         }else{
             notifyAt = NSDate(timeIntervalSince1970:reservation.pickupTime! - ReservationUtils.PICKUP_NOTIFICATION_BEFORE)
         }
-        NotificationUtils.setNotification(notifyAt, message: "Pick-up reminder. You are \(Int(ReservationUtils.PICKUP_NOTIFICATION_BEFORE/60)) minutes away from your car pick-up time.", actionLabel: "Open", userInfo: ["reservationId": reservation._id!, "type":"pickup", "appRoute": API.connectedAppURL, "appGUID": API.connectedAppGUID, "customAuth": API.connectedCustomAuth])
+        NotificationUtils.setNotification(
+            notifyAt,
+            message: "Pick-up reminder. You are \(Int(ReservationUtils.PICKUP_NOTIFICATION_BEFORE/60)) minutes away from your car pick-up time.",
+            actionLabel: "Open",
+            userInfo: [
+                "reservationId": reservation._id!,
+                "type":"pickup",
+                USER_DEFAULTS_KEY_APP_ROUTE: API.connectedAppURL,
+                USER_DEFAULTS_KEY_PUSH_APP_GUID: API.connectedPushAppGUID,
+                USER_DEFAULTS_KEY_PUSH_CLIENT_SECRET: API.connectedPushClientSecret,
+                USER_DEFAULTS_KEY_MCA_TENANT_ID: API.connectedMcaTenantId
+            ])
     }
     static func setDropoffNotification(reservation:ReservationsData){
         let dropOffTime = NSDate(timeIntervalSince1970:(reservation.dropOffTime)!)
@@ -98,7 +109,18 @@ class ReservationUtils {
         }else{
             notifyAt = NSDate(timeIntervalSince1970:(reservation.dropOffTime)! - ReservationUtils.DROPOFF_NOTIFICATION_BEFORE)
         }
-        NotificationUtils.setNotification(notifyAt, message: "Drop-off reminder. You are \(Int(ReservationUtils.DROPOFF_NOTIFICATION_BEFORE/60)) minutes away from your car drop-off time.", actionLabel: "Open", userInfo: ["reservationId":reservation._id!, "type":"dropoff", "appRoute": API.connectedAppURL, "appGUID": API.connectedAppGUID, "customAuth": API.connectedCustomAuth])
+        NotificationUtils.setNotification(
+            notifyAt,
+            message: "Drop-off reminder. You are \(Int(ReservationUtils.DROPOFF_NOTIFICATION_BEFORE/60)) minutes away from your car drop-off time.",
+            actionLabel: "Open",
+            userInfo: [
+                "reservationId":reservation._id!,
+                "type":"dropoff",
+                USER_DEFAULTS_KEY_APP_ROUTE: API.connectedAppURL,
+                USER_DEFAULTS_KEY_PUSH_APP_GUID: API.connectedPushAppGUID,
+                USER_DEFAULTS_KEY_PUSH_CLIENT_SECRET: API.connectedPushClientSecret,
+                USER_DEFAULTS_KEY_MCA_TENANT_ID: API.connectedMcaTenantId
+            ])
         
     }
 }
