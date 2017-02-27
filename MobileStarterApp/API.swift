@@ -22,7 +22,7 @@ struct API {
     //static let defaultAppURL = "https://iota-starter-server.mybluemix.net" // Your Bluemix Application URL
     static let defaultPushAppGUID = "" // (Optional) Your Push Notifications Service
     static let defaultPushClientSecret = "" // (Optional) Your Push Notifications Service
-    static let defaultMcaTenantId = ""
+    static let defaultMcaTenantId = "" // (Optional) Your Mobile Client Access Service
     static var bmRegion = BMSClient.Region.usSouth
     static var customRealm = "custauth"
 

@@ -68,17 +68,25 @@ To enable push notifications, complete the following steps:
 
 6. Change the bundle ID of the Xcode project to your app ID.
 
-7. In Xcode, select your iOS device as the build target and press **Build and run**.
+7. Edit the **API.swift file**, and set the `defaultPushAppGUID` and `defaultPushClientSecret` properties to the App Guid and Client Secret in Mobile Options for your Push Notifications service.
+```
+    static let defaultPushAppGUID = ""             // (Optional) Your Push Notifications Service
+    static let defaultPushClientSecret = ""        // (Optional) Your Push Notifications Service
 
-8. On the mobile app, tap **Specify Server**.
+    static var bmRegion = BMSClient.Region.usSouth
+```
 
-9. To start the camera function, tap the QR code image.
+8. In Xcode, select your iOS device as the build target and press **Build and run**.
 
-10. From a browser, connect to the server application and display the QR code:
+9. On the mobile app, tap **Specify Server**.
+
+10. To start the camera function, tap the QR code image.
+
+11. From a browser, connect to the server application and display the QR code:
   - If you are connecting your mobile app to the predeployed IBM test Mobility Starter Application server,  can find the QR code on the Starter Experience home page.
   - If you are connecting your mobile app to your own server instance, you can find the QR code for your server instance at the bottom of the following page: `https://<your-app-route>.mybluemix.net/`
   
-11. Scan the QR code from your mobile app.
+12. Scan the QR code from your mobile app.
 
 For more information, see [Push notifications](https://console.ng.bluemix.net/docs/services/mobilepush/t_push_provider_ios.html).
 
@@ -94,6 +102,13 @@ Set whether to use custom authentication for the `okAction` function.
 
 * [API.swift](MobileStarterApp/API.swift) doInitialize()  
 Initialize the Mobile Client Access client SDK.
+Edit the API.swift file, and set the `defaultMcaTenantId` property to the TenantId in Mobile Options for your Mobile Client Access service.
+```
+    static let defaultMcaTenantId = ""             // (Optional) Your Mobile Client Access Service
+    static var bmRegion = BMSClient.Region.usSouth
+    static var customRealm = "custauth"
+```
+
 
 For more information, see [Configuring the Mobile Client Access client SDK for iOS](https://console.ng.bluemix.net/docs/services/mobileaccess/custom-auth-ios-swift-sdk.html).
 
@@ -108,6 +123,9 @@ The IoT for Automotive - Mobility Starter Application on Bluemix stores all of t
 ## Apple Developer Program License Notice
 
 IBM is delivering this sample source code for IoT for Automotive Starter Mobile Application to Client for further development, build and test. Client understands and confirms that further development (whether performed by the Client or by IBM acting on the Client's behalf) is undertaken under the Client's Apple Developer Program or Apple Developer Enterprise Program Agreement. The Client confirms that they have all appropriate Apple Developer Program license(s) and that the Client, as Apple's licensee, is subject to, and will comply with, the terms of the appropriate Apple Developer Program Agreement.
+
+## Questions, comments or suggestions
+For your questions, comments or suggestions to us, visit [Watson IoT for Automotive Application community site] (https://www.ibm.com/developerworks/community/groups/service/html/communitystart?communityUuid=3b06ca1c-fd7c-4a59-a888-e5e3a8384091).
 
 ## Useful links
 
