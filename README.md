@@ -91,28 +91,7 @@ To enable push notifications, complete the following steps:
 For more information, see [Push notifications](https://console.ng.bluemix.net/docs/services/mobilepush/t_push_provider_ios.html).
 
 ### Mobile Client Access service
-
-The IoT for Automotive - Mobility Starter Application car sharing mobile app provides a simple demonstration of the Mobile Client Access service. The app logs in with the user name and password by using the  Mobile Client Access for custom authentication.
-
-* [CustomAuthDelegate.swift](MobileStarterApp/CustomAuthDelegate.swift) onAuthenticationChallengeReceived()  
-Call `submitAuthenticationChallengeAnswer()` with the user name and password that you entered in the login alert.
-
-* [QRCodeReaderViewController.swift](MobileStarterApp/QRCodeReaderViewController.swift) configureVideoCapture()  
-Set whether to use custom authentication for the `okAction` function.
-
-* [API.swift](MobileStarterApp/API.swift) doInitialize()  
-Initialize the Mobile Client Access client SDK.
-Edit the API.swift file, and set the `defaultMcaTenantId` property to the TenantId in Mobile Options for your Mobile Client Access service.
-```
-    static let defaultMcaTenantId = ""             // (Optional) Your Mobile Client Access Service
-    static var bmRegion = BMSClient.Region.usSouth
-    static var customRealm = "custauth"
-```
-
-
-For more information, see [Configuring the Mobile Client Access client SDK for iOS](https://console.ng.bluemix.net/docs/services/mobileaccess/custom-auth-ios-swift-sdk.html).
-
-You also need to add and configure Mobile Client Access for custom authentication on the IoT for Automotive - Mobility Starter Application server. For more information, see [IoT for Automotive - Mobility Starter Application server]( https://github.com/ibm-watson-iot/iota-starter-server).
+You cannot utilize Mobile Client Access for IoT for Automotive - Mobility Starter Application mobile app because Mobile Client Access service doesn't support custom authentication any more.
 
 ## Reporting defects
 To report a defect with the IoT for Automotive - Mobility Starter Application mobile app, go to the [Issues](https://github.com/ibm-watson-iot/iota-starter-carsharing/issues) section.
