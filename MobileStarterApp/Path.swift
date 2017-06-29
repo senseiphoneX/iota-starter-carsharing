@@ -15,8 +15,8 @@ class Path {
     class func fromDictionary(array:NSArray) -> [Path] {
         var returnArray:[Path] = []
         for item in array {
-            if let features = item["features"] as? [NSDictionary] {
-                let geometry = features[0]["geometry"] as? NSDictionary
+            if let features = (item as! [String:AnyObject])["features"]{
+                let geometry = (features as! [[String:AnyObject]])[0]["geometry"] as? NSDictionary
                 returnArray.append(Path(dictionary: geometry!))
             }
         }
