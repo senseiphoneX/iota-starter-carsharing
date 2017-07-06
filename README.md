@@ -38,13 +38,15 @@ To try the IoT for Automotive - Mobility Starter Application mobile app for iOS 
 ```$ pod install```  
 ```$ open MobileStarterApp.xcworkspace```
 
-4. Edit the **API.swift file**, and set the `defaultAppURL` property to the URL for your IoT for Automotive - Mobility Starter Application server app.
+4. Set bundle identifier and signing properly for your project in reference to [Creating Provisioning Profiles Using Your Developer Account](https://developer.apple.com/library/content/documentation/IDEs/Conceptual/AppDistributionGuide/MaintainingProfiles/MaintainingProfiles.html#//apple_ref/doc/uid/TP40012582-CH30-SW24)
 
-5. Go to the upper left of the Xcode UI, click **Run**.
+5. Edit the **API.swift file**, and set the `defaultAppURL` property to the URL for your IoT for Automotive - Mobility Starter Application server app.
 
-6. To deploy the mobile app on your device, see [Launching Your App on Devices](https://developer.apple.com/library/content/documentation/IDEs/Conceptual/AppDistributionGuide/LaunchingYourApponDevices/LaunchingYourApponDevices.html).
+6. Go to the upper left of the Xcode UI, click **Run**.
 
-7. Optional: If you would like to be notified about certain events, for example, severe weather at the pickup location, enable push notifications, as outlined in the next procedure.
+7. To deploy the mobile app on your device, see [Launching Your App on Devices](https://developer.apple.com/library/content/documentation/IDEs/Conceptual/AppDistributionGuide/LaunchingYourApponDevices/LaunchingYourApponDevices.html).
+
+8. Optional: If you would like to be notified about certain events, for example, severe weather at the pickup location, enable push notifications, as outlined in the next procedure.
 
 To view a video recording that demonstrates how to complete the steps to deploy the mobile app, click play:
 
