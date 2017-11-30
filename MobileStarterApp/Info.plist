@@ -15,15 +15,17 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.3.4</string>
+	<string>1.3.5</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>20170703</string>
+	<string>20171108</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>Read QR code to specify another server</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Using your location, we will analyze your driving behavior</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Using your location, we will analyze your driving behavior</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
