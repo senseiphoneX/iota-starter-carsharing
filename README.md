@@ -1,7 +1,7 @@
 # IBM IoT for Automotive - Mobility Starter Application mobile app for iOS
 
 ## Overview
-The IBM IoT for Automotive - Mobility Starter Application uses the **Context Mapping** and **Driver Behavior** services that are available on **IBM Bluemix** to help you to quickly build a smart car-sharing automotive solution. The IBM IoT for Automotive - Mobility Starter Application consists of a mobile app and a server component.
+The IBM IoT for Automotive - Mobility Starter Application uses the **Context Mapping** and **Driver Behavior** services that are available on **IBM Cloud** to help you to quickly build a smart car-sharing automotive solution. The IBM IoT for Automotive - Mobility Starter Application consists of a mobile app and a server component.
 
 ### Mobile app
 The starter app provides a mobile app for customers to quickly find and hire a car without human intervention from a car-hire company. If you are a car-hire customer, you can use the mobile app to do the following tasks:
@@ -14,7 +14,7 @@ The starter app provides a mobile app for customers to quickly find and hire a c
 While you drive the car, the service tracks your location and also records your driving behavior. When you reach your driving destination, you can view information about each trip that you took in the car and you can also view your driving behavior score.
 
 ### Server component
-The IoT for Automotive - Mobility Starter Application mobile app interacts with the server component. The server component provides the back-end car sharing and system monitoring service that provides more features for car-hire companies. By default, the mobile app connects to a test server that is provided by IBM. You can also choose to deploy your own server instance to IBM Bluemix and connect your mobile app to that instance instead of the test system. For more information about deploying the car-sharing server component, see [ibm-watson-iot/iota-starter-server](https://github.com/ibm-watson-iot/iota-starter-server).
+The IoT for Automotive - Mobility Starter Application mobile app interacts with the server component. The server component provides the back-end car sharing and system monitoring service that provides more features for car-hire companies. By default, the mobile app connects to a test server that is provided by IBM. You can also choose to deploy your own server instance to IBM Cloud and connect your mobile app to that instance instead of the test system. For more information about deploying the car-sharing server component, see [ibm-watson-iot/iota-starter-server](https://github.com/ibm-watson-iot/iota-starter-server).
 
 ## Prerequisites
 
@@ -64,18 +64,19 @@ To enable push notifications, complete the following steps:
 
 3. Create an APN development provisioning profile.
 
-4. Go to the Bluemix Push Notifications Dashboard and bind the APNs that you created to your server app.
+4. Go to the IBM Cloud Push Notifications Dashboard and bind the APNs that you created to your server app.
 
 5. Connect your iOS mobile device to your Apple Mac.
 
 6. Change the bundle ID of the Xcode project to your app ID.
 
 7. Edit the **API.swift file**, and set the `defaultPushAppGUID` and `defaultPushClientSecret` properties to the App Guid and Client Secret in Mobile Options for your Push Notifications service.
+
 ```
     static let defaultPushAppGUID = ""             // (Optional) Your Push Notifications Service
     static let defaultPushClientSecret = ""        // (Optional) Your Push Notifications Service
 
-    static var bmRegion = BMSClient.Region.usSouth
+    static var bmRegion = BMSClient.Region.usSouth    
 ```
 
 8. In Xcode, select your iOS device as the build target and press **Build and run**.
@@ -99,7 +100,7 @@ You cannot utilize Mobile Client Access for IoT for Automotive - Mobility Starte
 To report a defect with the IoT for Automotive - Mobility Starter Application mobile app, go to the [Issues](https://github.com/ibm-watson-iot/iota-starter-carsharing/issues) section.
 
 ## Privacy notice
-The IoT for Automotive - Mobility Starter Application on Bluemix stores all of the driving data that is obtained while you use the mobile app.
+The IoT for Automotive - Mobility Starter Application on IBM Cloud stores all of the driving data that is obtained while you use the mobile app.
 
 ## Apple Developer Program License Notice
 
@@ -114,6 +115,6 @@ For your questions, comments or suggestions to us, visit [Watson IoT for Automot
 - [IBM Watson Internet of Things](http://www.ibm.com/internet-of-things/)  
 - [IBM Watson IoT Platform](http://www.ibm.com/internet-of-things/iot-solutions/watson-iot-platform/)   
 - [IBM Watson IoT Platform Developers Community](https://developer.ibm.com/iotplatform/)
-- [IBM Bluemix](https://bluemix.net/)  
-- [IBM Bluemix documentation](https://www.ng.bluemix.net/docs/)  
-- [IBM Bluemix developers community](http://developer.ibm.com/bluemix)  
+- [IBM Cloud](https://bluemix.net/)  
+- [IBM Cloud documentation](https://www.ng.bluemix.net/docs/)  
+- [IBM Cloud developers community](http://developer.ibm.com/bluemix)  
