@@ -72,7 +72,7 @@ To enable push notifications, complete the following steps:
 
 7. Edit the **API.swift file**, and set the `defaultPushAppGUID` and `defaultPushClientSecret` properties to the App Guid and Client Secret in Mobile Options for your Push Notifications service.
 
-```
+```swift
     static let defaultPushAppGUID = ""             // (Optional) Your Push Notifications Service
     static let defaultPushClientSecret = ""        // (Optional) Your Push Notifications Service
 
